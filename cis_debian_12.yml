@@ -12,8 +12,9 @@
 policy:
   id: "cis_debian_12"
   file: "cis_debian_12.yml"
+  version: "0.1"
   name: "Center for Internet Security Debian Linux 12 Benchmark v1.1.0"
-  description: "This document provide prescriptive guidance for establishing a secure configuration posture for Debian 12."
+  description: "This document provide prescriptive guidance for establishing a secure configuration posture for Debian 12. This version is pursuing the best guidance for server so there is level 1 and level 2 rule. It's also applicable to workstation but not guarantee for the current version."
   references:
     - https://www.cisecurity.org/cis-benchmarks
 
@@ -40,6 +41,7 @@ checks:
     description: "The cramfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A cramfs image can be used without having to first decompress the image."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install cramfs /bin/false or /bin.true` and `blacklist cramfs`. Then run `modprobe -r cramfs 2>/dev/null; rmmod cramfs 2>/dev/null` to remove cramfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -57,6 +59,7 @@ checks:
     description: "The freevxfs filesystem type is a free version of the Veritas type filesystem. This is the primary filesystem type for HP-UX operating systems."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install freevxfs /bin/(false|true)` and `blacklist freevxfs`. Then run `modprobe -r freevxfs 2>/dev/null; rmmod freevxfs 2>/dev/null` to remove freevxfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -74,6 +77,7 @@ checks:
     description: "The hfs filesystem type is a hierarchical filesystem that allows you to mount Mac OS filesystems."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install hfs /bin/(false|true)` and `blacklist hfs`. Then run `modprobe -r hfs 2>/dev/null; rmmod hfs 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -91,6 +95,7 @@ checks:
     description: "The hfsplus filesystem type is a hierarchical filesystem that allows you to mount Mac OS filesystems."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install hfsplus /bin/(false|true)` and `blacklist hfsplus`. Then run `modprobe -r hfsplus 2>/dev/null; rmmod hfsplus 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -108,6 +113,7 @@ checks:
     description: "The jffs2 (journaling flash filesystem 2) filesystem type is a log-structured filesystem used in flash memory devices."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install jffs2 /bin/(false|true)` and `blacklist jffs2`. Then run `modprobe -r jffs2 2>/dev/null; rmmod jffs2 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -125,6 +131,7 @@ checks:
     description: "The overlayfs is a Linux filesystem that layers multiple filesystems to create a single unified view which allows a user to merge several mount points into a unified filesystem."
     rationale : "The overlayfs has known CVE's: CVE-2023-32629, CVE-2023-2640, CVE-2023-0386. Disabling the overlayfs reduces the local attack surface by removing support for unnecessary filesystem types and mitigates potential risks associated with unauthorized execution of setuid files, enhancing the overall system security."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install overlayfs /bin/(false|true)` and `blacklist overlayfs`. Then run `modprobe -r overlayfs 2>/dev/null; rmmod overlayfs 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -142,6 +149,7 @@ checks:
     description: "The squashfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A squashfs image can be used without having to first decompress the image."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install squashfs /bin/(false|true)` and `blacklist squashfs`. Then run `modprobe -r squashfs 2>/dev/null; rmmod squashfs 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -159,6 +167,7 @@ checks:
     description: "The udf filesystem type is the universal disk format used to implement ISO/IEC 13346 and ECMA-167 specifications. This is an open vendor filesystem type for data storage on a broad range of media. This filesystem type is necessary to support writing DVDs and newer optical disc formats."
     rationale : "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install udf /bin/(false|true)` and `blacklist udf`. Then run `modprobe -r udf 2>/dev/null; rmmod udf 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -176,6 +185,7 @@ checks:
     description: "USB storage provides a means to transfer and store files ensuring persistence and availability of the files independent of network connection status. Its popularity and utility has led to USB-based malware being a simple and common means for network infiltration and a first step to establishing a persistent threat within a networked environment."
     rationale : "Restricting USB access on the system will decrease the physical attack surface for a device and diminish the possible vectors to introduce malware."
     remediation: "Create or edit a file in /etc/modprobe.d/ .Add the following lines in it `install usb-storage /bin/(false|true)` and `blacklist usb-storage`. Then run `modprobe -r usb-storage 2>/dev/null; rmmod usb-storage 2>/dev/null` to remove hfs from the kernel."
+    level: "Level 1"
     references: 
       - ""
     compliance:
@@ -186,3 +196,33 @@ checks:
       - "f:/etc/modprobe.d/* -> r:^\s*install\s+usb-storage\s+/bin/(false|true)"
       - "f:/etc/modprobe.d/* -> r:^\s*blacklist\s+usb-storage"
       - 'not c:lsmod usb-storage -> r:^usb-storage\s'
+
+# 1.1.1.10 Ensure unused filesystems kernel modules are not available. (Manual)
+  - id: 11110
+    title: "Ensure unused filesystems are not available."
+
+# 1.1.2 Configure filesystem partition
+# 1.1.2.1 Configure /tmp
+#
+#
+
+# NOT FINISHED
+
+  - id: 11211
+    title: "Ensure /tmp is a separate partition."
+    description: "The /tmp directory is a world-writable directory used for temporary storage by all users and some applications"
+    rationale: ""
+    remediation: ""
+    level: "Level 1"
+    references:
+      - ""
+    compliance:
+      - cis: ["1.1.2.1.1"]
+      - others: [""] 
+    condition:
+    rules:
+      - 'c:findmnt -kn /tmp -> r:^\s*/tmp\s'
+      - 'c:systemctl is-enabled tmp.mount -> !r:maskend|disabled && r:generated|enabled'
+
+# 
+
