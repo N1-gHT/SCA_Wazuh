@@ -1,6 +1,6 @@
 # SCA_Wazuh
-Wazuh ruleset is used to détect configuration problem, application errors, system anomalies or security policy violation
-This ruleset is following the CIS BenchMark recommandation
+Wazuh ruleset is used to détect configuration problem, application errors, system anomalies or security policy violation.
+This ruleset is following the CIS BenchMark recommandation. \
 
 ## Directory Structure
 
@@ -22,18 +22,18 @@ This ruleset is following the CIS BenchMark recommandation
 
 ## Template to use : 
 
-X.X.X.X Title of the rule. (Automated|Manual)
-    - id: id_rule
-    title: "title of the rule"
-    description: "description of the rule "
-    rationale: " why is this rule is important"
-    remediation: "remediation to valide the rule"
-    level: "level of the cis rule"
-    references:
-      - ""
-    compliance:
-      - cis: [""]
-      - others: [""] 
-    condition: all|any
-    rules:
-      use "" (button 3 for special caracter on azerty)
+X.X.X.X Title of the rule. (Automated|Manual) \
+    - id: id_rule \
+    title: "title of the rule" \
+    description: "description of the rule " \
+    rationale: " why is this rule is important" \
+    remediation: "remediation to valide the rule" \
+    level: "level of the cis rule" \
+    references: \
+      - "" \
+    compliance: \
+      - cis: [""] \
+      - others: [""]  \
+    condition: all|any \
+    rules: \
+      use "" (button 3 for special caracter on azerty) \
