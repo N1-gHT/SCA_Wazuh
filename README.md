@@ -22,7 +22,7 @@ This ruleset is following the CIS BenchMark recommandation
 
 ## Template to use : 
 
-X.X.X.X Title of the rume. (Automated|Manual)
+X.X.X.X Title of the rule. (Automated|Manual)
     - id: id_rule
     title: "title of the rule"
     description: "description of the rule "
@@ -36,5 +36,4 @@ X.X.X.X Title of the rume. (Automated|Manual)
       - others: [""] 
     condition: all|any
     rules:
-        if it's a command use ' (button 4 for special caracter on azerty)
-        else use " (button 3 for special caracter on azerty)
+      use "" (button 3 for special caracter on azerty)
