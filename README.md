@@ -38,4 +38,5 @@ X.X.X.X Title of the rule. (Automated|Manual)
     condition: all|any
     rules:
       use "" (button 3 for special caracter on azerty)
+      use '' (button 4 for special caracter on azerty) when you want to do a commande (ex 'c:findmnt -kn /home -> r:^\s*/home\s')
 ```
