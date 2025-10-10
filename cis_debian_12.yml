@@ -560,6 +560,7 @@ checks:
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /var filesystem is only intended for variable files such as logs, set this option to ensure that users cannot create setuid files in /var."
     remediation: "- IF - a separate partition exists for /var. Edit the /etc/fstab file and add nosuid to the fourth field (mounting options) for the /var partition. Example: <device> /var <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /var with the configured options: # mount -o remount /var."
+    level: "Level 1"
     compliance:
       - cis: ["1.1.2.4.3"]
       - cis_csc_v8: ["3.3"]
@@ -799,6 +800,7 @@ checks:
     rationale: "The default installation only creates a single / partition. Since the /var/log/audit directory contains the audit.log file which can grow quite large, there is a risk of resource exhaustion. It will essentially have the whole disk available to fill up and impact the system as a whole. In addition, other operations on the system could fill up the disk unrelated to /var/log/audit and cause auditd to trigger its space_left_action as the disk is full. See man auditd.conf for details. Configuring /var/log/audit as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attacker's ability to create exploits on the system. Other options allow for specific behavior. See man mount for exact details regarding filesystem-independent and filesystem-specific options. As /var/log/audit contains audit logs, care should be taken to ensure the security and integrity of the data and mount point."
     impact: "Resizing filesystems is a common activity in cloud-hosted servers. Separate filesystem partitions may prevent successful resizing or may require the installation of additional tools solely for the purpose of resizing operations. The use of these additional tools may introduce their own security considerations."
     remediation: "For new installations, during installation create a custom partition setup and specify a separate partition for /var/log/audit. For systems that were previously installed, create a new partition and configure /etc/fstab as appropriate."
+    level: "Level 2"
     references:
       - "http://tldp.org/HOWTO/LVM-HOWTO/"
     compliance:
@@ -871,6 +873,7 @@ checks:
     description: "The noexec mount option specifies that the filesystem cannot contain executable binaries."
     rationale: "Since the /var/log/audit filesystem is only intended for audit logs, set this option to ensure that users cannot run executable binaries from /var/log/audit."
     remediation: "- IF - a separate partition exists for /var/log/audit. Edit the /etc/fstab file and add noexec to the fourth field (mounting options) for the /var/log/audit partition. Example: <device> /var/log/audit <fstype> defaults,rw,nosuid,nodev,noexec,relatime 0 0 Run the following command to remount /var/log/audit with the configured options: # mount -o remount /var/log/audit."
+    level: "Level 1"
     compliance:
       - cis: ["1.1.2.7.4"]
       - cis_csc_v8: ["3.3"]
@@ -893,16 +896,241 @@ checks:
 # 1.2.1 - Configure Package Repositories
 #
 #
+# The creation of a “to be verified” category seems necessary for rules that can only be implemented entirely manually.
 
 # 1.2.1.1 Ensure GPG Keys are configured (Manual)
-  - id: 1211
-    title: "Ensure GPG Keys are configured."
-    description: "Most package managers implement GPG Keys signing to verify package integrity during installation."
-    rationale: "It is important to ensure that updates are obtained from a valide source to protect against spoofing that could lead to the inadvertent installation of malware on the system."
-    remediation: ""
+#  - id: 1211
+#    title: "Ensure GPG Keys are configured."
+#    description: "Most package managers implement GPG Keys signing to verify package integrity during installation."
+#    rationale: "It is important to ensure that updates are obtained from a valide source to protect against spoofing that could lead to the inadvertent installation of malware on the system."
+#    remediation: "Update your package manager GPG keys in accordance with site policy."
+#    level: "Level 1"
+#    compliance:
+#      - cis: ["1.2.1.1"]
+#      - others: [""]
+#    condition: all
+#    rules:
+#      - 
+# This rule is currently not implementable because it requires human intervention
+
+# 1.2.1.2 Ensure package manager repositories are configured (Manual)
+#  - id: 1212
+#    title: "Ensure package manager repositories are configured."
+#    description: "Systems need to have package manager repositories configured to ensure they receive the latest patches and updates."
+#    rationale: "If a system's package repositories are misconfigured important patches may not be identified or a rogue repository could introduce compromised software."
+#    remediation: "Configure your package manager repositories according to site policy."
+#    level: "Level 1"
+#    compliance:
+#      - cis: ["1.2.1.2"]
+#      - others: [""]
+#    condition: all
+#    rules:
+#      - "c:apt-cache policy -> r:"
+# This rule is currently not implementable because it requires human intervention
+
+# 1.2.2 - Configure Package Updates
+#
+#
+
+# 1.2.2.1 Ensure update, patches, and additional security software are installed (Manual)
+  - id: 1221
+    title: "Ensure updates, patches, and additionnal security software are installed."
+    description: "Periodically patches are released for included software either due to security flaws or to include additional functionality."
+    rationale: ""
+    remediation: "Run the following command to update all packages following local site policy guidance. # apt update && apt upgrade or # apt update && apt dist-upgrade."
+    level: "Level 1"
     compliance:
-      - cis: ["1.2.1.1"]
+      - cis: ["1.2.2.1"]
+      - mitre_mitigations: ["M1051"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1195", "T1195.001"]
       - others: [""]
     condition: all
     rules:
-      - 
+      - 'c:apt update -> r:^\s*All\s+packages\s+are\s+up\s+to\s+date.'
+      - 'c:apt -s upgrade -> r:\s*^0\s+upgraded,\s+0\s+newly\s+installed,\s+0\s+to\s+remove\s+and\s+0\s+not\s+upgraded\.'
+
+# 1.3 - Mandatory Access Control
+# 1.3.1 - Configure AppArmor
+#
+#
+
+# 1.3.1.1 Ensure AppArmor is installed (Automated)
+  - id: 13111
+    title: "Ensure AppArmor is installed."
+    description: "AppArmor provides Mandatory Access Controls."
+    rationale: "Without a Mandatory Access Control system installed only the default Discretionary Access Control system will be available."
+    remediation: "Install AppArmor. # apt install apparmor apparmor-utils."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.3.1.1"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1026"]
+      - mitre_tactics: ["TA0003"]
+      - mitre_techniques: ["T1068", "T1565", "T1565.001", "T1565.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - "c:dpkg-query -W -f='${Status}\n' apparmor -> r:^\s*install\s+ok\s+installed$"
+      - "c:dpkg-query -W -f='${Status}\n' apparmor-utils -> r:^\s*install\s+ok\s+installed$"
+
+# 1.3.1.2 Ensure AppArmor is enabled in the bootloader configuration. (Automated)
+  - id: 1312
+    title: "Ensure AppArmor is enabled in the bootloader configuration."
+    description: "Configure AppArmor to be enabled at boot time and verify that it has not been overwritten by the bootloader boot parameters. Note: This recommendation is designed around the grub bootloader, if LILO or another bootloader is in use in your environment enact equivalent settings."
+    rationale: "AppArmor must be enabled at boot time in your bootloader configuration to ensure that the controls it provides are not overridden."
+    remediation: 'Edit /etc/default/grub and add the apparmor=1 and security=apparmor parameters to the GRUB_CMDLINE_LINUX= line GRUB_CMDLINE_LINUX="apparmor=1 security=apparmor" Run the following command to update the grub2 configuration: # update-grub.'
+    level: "Level 1"
+    compliance:
+      - cis: ["1.3.1.2"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1026"]
+      - mitre_tactics: ["TA0003"]
+      - mitre_techniques: ["T1068", "T1565", "T1565.001", "T1565.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'f:/boot/grub/grub.cfg -> r:\s*\t*linux && !r:apparmor=1'
+      - 'f:/boot/grub/grub.cfg -> r:\s*\t*linux && !r:security=apparmor'
+
+# 1.3.1.3 Ensure AppArmor Profiles are in enforce or complain mode. (Automated)
+  - id: 1313
+    title: "Ensure AppArmor Profiles are ine enforce or complain mode."
+    description: "AppArmor profiles define what ressources applications are able to access."
+    rationale: "Security configuration requirements vary from site to site. This item is intended to ensure that any policies that exist on the system are activated"
+    remediation: "Run the following command to set all profiles to enforce mode : # aa-enforce /etc/apparmor.d/* or run this command to set in profiles to complain mode : # aa-complain /etc/apparmor.d/*. NOTE: Any unconfined processes may need to have a profile created or activated for them and then be restarted."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.3.1.3"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - mitre_mitigations: ["----"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1497"]
+      - nist_sp_800-53: ["AC-3"]
+    condition: all
+    rules:
+      - 'c:apparmor_status -> r:^\d+\s+profiles\s+are\s+loaded'
+      - 'c:apparmor_status -> r:^\d+\s+profiles\s+are\s+in\s+enforce\s+mode'
+      - 'c:apparmor_status -> r:^\d+\s+profiles\s+are\s+in\s+complain\s+mode'
+      - 'not c:apparmor_status -> r:^[1-9]\d*\s+profiles\s+are\s+unconfined\s+mode'
+      - 'not c:apparmor_status -> r:^[1-9]\d*\s+processes\s+are\s+unconfined'
+
+# 1.3.1.4 Ensure all AppArmor Profiles are in enforce mode. (Automated)
+  - id: 1314
+    title: "Ensure AppArmor Profiles are ine enforce or complain mode."
+    description: "AppArmor profiles define what ressources applications are able to access."
+    rationale: "Security configuration requirements vary from site to site. This item is intended to ensure that any policies that exist on the system are activated"
+    remediation: "Run the following command to set all profiles to enforce mode : # aa-enforce /etc/apparmor.d/* or run this command to set in profiles to complain mode : # aa-complain /etc/apparmor.d/*. NOTE: Any unconfined processes may need to have a profile created or activated for them and then be restarted."
+    level: "Level 2"
+    compliance:
+      - cis: ["1.3.1.4"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - mitre_mitigations: ["M1048"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1068", "T1068.000", "T1565", "T1565.001", "T14565.003"]
+      - nist_sp_800-53: ["AC-3"]
+    condition: all
+    rules:
+      - 'c:apparmor_status -> r:^[1-9]\d*\s+profiles\s+are\s+loaded'
+      - 'c:apparmor_status -> r:^[1-9]\d*\s+profiles\s+are\s+in\s+enforce\s+mode'
+      - 'c:apparmor_status -> r:^0\s+profiles\s+are\s+in\s+complain\s+mode'
+      - 'c:apparmor_status -> r:^0\s+profiles\s+are\s+in\s+unconfined\s+mode'
+      - 'c:apparmor_status -> r:^0\s+processes\s+are\s+unconfined'
+      - 'c:apparmor_status -> r:^0\s+processes\s+are\s+in\s+complain\s+mode'
+
+# 1.4 - Configure Bootloader
+#
+#
+
+# 1.4.1 Ensure bootloader password is set (Automated)
+  - id: 141
+    title: "Ensure bootloader password is set."
+    description: "Setting the boot loader password will require that anyone rebooting the system must enter a password before being able to set command line boot parameters."
+    rationale: "Requiring a boot password upon execution of the boot loader will prevent an unauthorized user from entering boot parameters or changing the boot partition. This prevents users from weakening security (e.g. turning off AppArmor at boot time)."
+    impact: 'If password protection is enabled, only the designated superuser can edit a GRUB 2 menu item by pressing "e" or access the GRUB 2 command line by pressing "c" If GRUB 2 is set up to boot automatically to a password-protected menu entry the user has no option to back out of the password prompt to select another menu entry. Holding the SHIFT key will not display the menu in this case. The user must enter the correct username and password. If unable to do so, the configuration files will have to be edited via a LiveCD or other means to fix the problem You can add --unrestricted to the menu entries to allow the system to boot without entering a password. A password will still be required to edit menu items. More Information: https://help.ubuntu.com/community/Grub2/Passwords.'
+    remediation: 'Create an encrypted password with grub-mkpasswd-pbkdf2: # grub-mkpasswd-pbkdf2 --iteration-count=600000 --salt=64 Enter password: <password> Reenter password: <password> PBKDF2 hash of your password is <encrypted-password> Add the following into a custom /etc/grub.d configuration file: cat <<EOF exec tail -n +2 $0 set superusers="<username>" password_pbkdf2 <username> <encrypted-password> EOF The superuser/user information and password should not be contained in the /etc/grub.d/00_header file as this file could be overwritten in a package update. If there is a requirement to be able to boot/reboot without entering the password, edit /etc/grub.d/10_linux and add --unrestricted to the line CLASS= Example: CLASS="--class gnu-linux --class gnu --class os --unrestricted" Run the following command to update the grub2 configuration: # update-grub.'
+    level: "Level 1"
+    compliance:
+      - cis: ["1.4.1"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1046"]
+      - mitre_tactics: ["TA0003"]
+      - mitre_techniques: ["T1542"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'f:/boot/grub/grub.cfg -> r:^\s*\t*set superusers="[\w@-]+"'
+      - 'f:/boot/grub/grub.cfg -> r:^\s*\t*password_pbkdf2\s*\t*[\w@-]+\s+grub\.pbkdf2'
+
+# 1.4.2 Ensure access to bootloader config is configured. (Automated)
+  - id: 142
+    title: "Ensure access to bootloader config is configured."
+    description: "The grub configuration file contains information on boot settings and passwords for unlocking boot options."
+    rationale: "Setting the permissions to read and write for root only prevents non-root users from seeing the boot parameters or changing them. Non-root users who read the boot parameters may be able to identify weaknesses in security upon boot and be able to exploit them."
+    remediation: "Run the following commands to set permissions on your grub configuration: # chown root:root /boot/grub/grub.cfg # chmod u-x,go-rwx /boot/grub/grub.cfg."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.4.2"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1022"]
+      - mitre_tactics: ["TA0005", "TA0007"]
+      - mitre_techniques: ["T1542"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%n %a %u %U %g %G" /boot/grub/grub.cfg -> r:0 root 0 root && r:600'
+
+# 1.5 - Configure additionnal Process Hardening
+#
+#
+
+# 1.5.1 Ensure address layout randomization is enabled (Automated)
+  - id: 151
+    title: "Ensure access to bootloader config is configured."
+    description: "Address space layout randomization (ASLR) is an exploit mitigation technique which randomly arranges the address space of key data areas of a process."
+    rationale: "Randomly placing virtual memory regions will make it difficult to write memory page exploits as the memory placement will be consistenly shiftings."
+    remediation: "Set the parameter # kernel.randomuze_va_space = 2 in /etc/sysctl.conf or in a fil in /etc/sysctl.d/ ending in .conf."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.5.1"]
+      - cis_csc_v8: ["10.5"]
+      - cis_csc_v7: ["8.3"]
+      - mitre_mitigations: ["M1050"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1068", "T1068.000"]
+      - nist_sp_800-53: ["CM-6"]
+    condition: all
+    rules:
+      - 'c:sysctl kernel.randomize_va_space -> r:^kernel\.randomize_va_space\s*=\s*2$'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
+      - 'not f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
