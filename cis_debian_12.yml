@@ -1134,3 +1134,5 @@ checks:
       - 'c:sysctl kernel.randomize_va_space -> r:^kernel\.randomize_va_space\s*=\s*2$'
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
       - 'not f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
+
+# 1.5.2 Ensure ptrace_scope is restricted (Automated)
