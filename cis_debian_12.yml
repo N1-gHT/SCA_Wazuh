@@ -49,8 +49,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+cramfs\s+/bin/false'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+cramfs'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+cramfs\s+/bin/false'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+cramfs'
       - 'not c:lsmod cramfs -> r:^cramfs\s'
 
 # 1.1.1.2 Ensure freevxfs kernel module is not available. (Automated)
@@ -67,8 +67,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+freevxfs\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+freevxfs'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+freevxfs\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+freevxfs'
       - 'not c:lsmod freevxfs -> r:^freevxfs\s'
 
 # 1.1.1.3 Ensure hfs kernel module is not available. (Automated)
@@ -85,8 +85,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+hfs\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+hfs'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+hfs\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+hfs'
       - 'not c:lsmod hfs -> r:^hfs\s'
 
 # 1.1.1.4 Ensure hfsplus  kernel module is not available. (Automated)
@@ -103,8 +103,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+hfsplus\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+hfsplus'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+hfsplus\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+hfsplus'
       - 'not c:lsmod hfsplus -> r:^hfsplus\s'
 
 # 1.1.1.5 Ensure jffs2 kernel module is not available. (Automated)
@@ -121,8 +121,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+jffs2\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+jffs2'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+jffs2\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+jffs2'
       - 'not c:lsmod jffs2 -> r:^jffs2\s'
 
 # 1.1.1.6 Ensure overlayfs kernel module is not available. (Automated)
@@ -139,8 +139,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+overlayfs\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+overlayfs'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+overlayfs\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+overlayfs'
       - 'not c:lsmod overlayfs -> r:^overlayfs\s'
 
 # 1.1.1.7 Ensure squashfs kernel module is not available. (Automated)
@@ -157,8 +157,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+squashfs\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+squashfs'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+squashfs\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+squashfs'
       - 'not c:lsmod squashfs -> r:^squashfs\s'
 
 # 1.1.1.8 Ensure udf kernel module is not available. (Automated)
@@ -175,8 +175,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+udf\s+/bin/(false|true)'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+udf'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+udf\s+/bin/(false|true)'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+udf'
       - 'not c:lsmod udf -> r:^udf\s'
 
 # 1.1.1.9 Ensure usb-storage kernel module is not available. (Automated)
@@ -193,8 +193,8 @@ checks:
       - others: ["unknow"]
     condition: all
     rules: 
-      - 'f:/etc/modprobe.d/* -> r:^\s*install\s+usb-storage\s+/bin/(false|true'
-      - 'f:/etc/modprobe.d/* -> r:^\s*blacklist\s+usb-storage'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*install\s+usb-storage\s+/bin/(false|true'
+      - 'f:/etc/modprobe.d/*.conf -> r:^\s*blacklist\s+usb-storage'
       - 'not c:lsmod usb-storage -> r:^usb-storage\s'
 
 # 1.1.1.10 Ensure unused filesystems kernel modules are not available. (Manual)
@@ -1152,3 +1152,4 @@ checks:
     condition: all
     rules:
       - 'c:sysctl kernel.yama.ptrace_scope -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
