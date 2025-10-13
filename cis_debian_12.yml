@@ -1132,6 +1132,23 @@ checks:
     rules:
       - 'c:sysctl kernel.randomize_va_space -> r:^kernel\.randomize_va_space\s*=\s*2$'
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
-      - 'not f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
 
 # 1.5.2 Ensure ptrace_scope is restricted (Automated)
+  - id: 152
+    title: "Ensure ptrace_scope is restricted"
+    description: "The ptrace() system call provides a means by which one process may observe and control the execution of another process, and examine and change the tracee's memory registers."
+    rationale: "If one application is compromised, it would be possible for an attacker to attach to other running processes to extract additional credentials and continue to expand the scope of their attack."
+    remediation: "Set the parameter # kernel.yama.ptrace_scope parameter in /etc/sysctl.conf or in a file in /etc/sysctl.d/ ending in .conf to a value of 1,2 or 3."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.5.2"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - mitre_mitigations: ["1040"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1055", "T1055.008"]
+      - nist_sp_800-53: ["CM-6"]
+    condition: all
+    rules:
+      - 'c:sysctl kernel.yama.ptrace_scope -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
