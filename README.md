@@ -17,8 +17,8 @@ This ruleset is following the CIS BenchMark recommandation. \
 
 ## Update to come
 
-- creating rule for 1.1.1.10
-- file every description, rationale and remediation 
+This is a two-phase project: the first phase involves writing all the rules, and the second phase involves testing and correcting errors.
+### Currently in phase 1.
 
 ## Template to use : 
 
