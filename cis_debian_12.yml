@@ -931,7 +931,7 @@ checks:
 #
 #
 
-# 1.2.2.1 Ensure update, patches, and additional security software are installed (Manual)
+# 1.2.2.1 Ensure update, patches, and additional security software are installed. (Manual)
   - id: 1221
     title: "Ensure updates, patches, and additionnal security software are installed."
     description: "Periodically patches are released for included software either due to security flaws or to include additional functionality."
@@ -954,7 +954,7 @@ checks:
 #
 #
 
-# 1.3.1.1 Ensure AppArmor is installed (Automated)
+# 1.3.1.1 Ensure AppArmor is installed. (Automated)
   - id: 13111
     title: "Ensure AppArmor is installed."
     description: "AppArmor provides Mandatory Access Controls."
@@ -1057,7 +1057,7 @@ checks:
 #
 #
 
-# 1.4.1 Ensure bootloader password is set (Automated)
+# 1.4.1 Ensure bootloader password is set. (Automated)
   - id: 141
     title: "Ensure bootloader password is set."
     description: "Setting the boot loader password will require that anyone rebooting the system must enter a password before being able to set command line boot parameters."
@@ -1113,7 +1113,7 @@ checks:
 #
 #
 
-# 1.5.1 Ensure address layout randomization is enabled (Automated)
+# 1.5.1 Ensure address layout randomization is enabled. (Automated)
   - id: 151
     title: "Ensure access to bootloader config is configured."
     description: "Address space layout randomization (ASLR) is an exploit mitigation technique which randomly arranges the address space of key data areas of a process."
@@ -1134,7 +1134,7 @@ checks:
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
 
-# 1.5.2 Ensure ptrace_scope is restricted (Automated)
+# 1.5.2 Ensure ptrace_scope is restricted. (Automated)
   - id: 152
     title: "Ensure ptrace_scope is restricted"
     description: "The ptrace() system call provides a means by which one process may observe and control the execution of another process, and examine and change the tracee's memory registers."
@@ -1155,7 +1155,7 @@ checks:
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
 
-# 1.5.3 Ensure core dumps are restricted (Automated)
+# 1.5.3 Ensure core dumps are restricted. (Automated)
   - id: 153
     title: "Ensure core dumps are restricted"
     description: "A core dump is the memory of an executable program. It is used to determine why a program aborted. It can also be used to glean confidential information from a core file."
@@ -1175,7 +1175,7 @@ checks:
       - 'f:/etc/security/limits.d/*.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
 
-# 1.5.3 Ensure core dumps are restricted (Automated)
+# 1.5.3 Ensure core dumps are restricted. (Automated)
   - id: 154
     title: "Ensure core dumps are restricted with coredump"
     description: "A core dump is the memory of an executable program. It is used to determine why a program aborted. It can also be used to glean confidential information from a core file."
@@ -1198,7 +1198,7 @@ checks:
 #
 #
 
-# 1.6.1 Ensure message of the day is configured properly (Automated)
+# 1.6.1 Ensure message of the day is configured properly. (Automated)
   - id: 161
     title: "Ensure message of the day is configured properly."
     description: "The content of the /etc/motd file are displayed to users after login and function as a message of the day for authenticated users."
@@ -1216,7 +1216,7 @@ checks:
       - 'not f:/etc/motd'
       - 'not f:/etc/motd -> r:\\v|\\r|\\m|\s|Debian|Ubuntu'
 
-# 1.6.2 Ensure local login warning banner is configured properly (Automated)
+# 1.6.2 Ensure local login warning banner is configured properly. (Automated)
   - id: 162
     title: "Ensure local warning banner is configured properly."
     description: "The contents of th /etc/issue file are displayed to users prior to login for local terminals."
@@ -1233,7 +1233,7 @@ checks:
     rules:
       - 'not f:/etc/issue -> r:\\v|\\r|\\m|\s|Debian|Ubuntu'
 
-# 1.6.3 Ensure remote login warning banner is configured properly (Automated)
+# 1.6.3 Ensure remote login warning banner is configured properly. (Automated)
   - id: 163
     title: "Ensure remote warning banner is configured properly."
     description: "The contents of th /etc/issue.net file are displayed to users prior to login for local terminals."
@@ -1330,7 +1330,7 @@ checks:
 #
 #
 
-# 1.7.1 Ensure GDM is removed (Automated)
+# 1.7.1 Ensure GDM is removed. (Automated)
   - id: 171
     title: "Ensure GDM is removed."
     description: "The GNOME Display Manager (GDM) is a program that manages graphical display servers and handles graphical user logins."
@@ -1354,7 +1354,7 @@ checks:
     rules:
       - 'not c:dpkg-query -W -f="\${Status}\n" gdm3 -> r:^install ok installed$'
 
-# 1.7.2 Ensure GDM login banner is configured (Automated)
+# 1.7.2 Ensure GDM login banner is configured. (Automated)
   - id: 172
     title: "Ensure GDM login banner is configured"
     description: "GDM is the Gnome Display Manager which handles graphic login for GNOME based systems."
@@ -1373,7 +1373,7 @@ checks:
       - 'c:gsettings get org.gnome.login-screen banner-message-enable -> r:^true$'
       - 'not c:gsettings get org.gnome.login-screen banner-message-text -> r:^''''$'
 
-# 1.7.3 Ensure GDM disable-user-list option is enabled (Automadted)
+# 1.7.3 Ensure GDM disable-user-list option is enabled. (Automadted)
   - id: 173
     title: "Ensure GDM disable-user-list is enabled"
     description: "GDM is the Gnome Display Manager which handles graphic login for GNOME based systems. The disable-user-list options control if a list of users is displayed on the login screen."
@@ -1391,7 +1391,7 @@ checks:
     rules:
       - 'c:gsettings get org.gnome.login-screen disable-user-list -> r:^true$'
 
-# 1.7.4 Ensure GDM screen locks when the user is idle (Automated)
+# 1.7.4 Ensure GDM screen locks when the user is idle. (Automated)
   - id: 174
     title: "Ensure GDM screen locks when the user is idle."
     description: "GNOME Desktop Manager can make the screen lock automatically whenever the user is idle for some amount of time."
@@ -1411,7 +1411,7 @@ checks:
       - 'c:gsettings get org.gnome.desktop.screensaver lock-delay  | awk ''{print $2}'' -> n:<= 5'
       - 'c:gsettings get org.gnome.desktop.session idle-delay | awk ''{print $2}'' -> n:<= 900'
 
-# 1.7.5 Ensure GDM screen locks cannot be overriden (Automated)
+# 1.7.5 Ensure GDM screen locks cannot be overriden. (Automated)
   - id: 175
     title: "Ensure GDM scree, locks cannot be overridden."
     description: "GNOME Desktop Manager can lock down specific settings by using the lockdown mode in dconf to prevent users from changing specific settings. To lock down a dconf key or subpath, create a locks subdirectory in the keyfile directory. The files inside this directory contain a list of keys or subpaths to lock. Just as with the keyfiles, you may add any number of files to this directory."
@@ -1432,11 +1432,11 @@ checks:
       - 'f:/etc/dconf/db/local.d/locks/* -> r:^[^";]\s*/org/gnome/desktop/session/idle-delay\b'
       - 'f:/etc/dconf/db/local.d/locks/* -> r:^[^";]\s*/org/gnome/desktop/screensaver/lock-delay\b'
 
-# 1.7.6 Ensure GDM automatic mounting of removable media is disabled (Automated) --- Implementation in progress
-# 1.7.7 Ensure GDM disabling automatic mountig of removable media is not overriden (Automated) --- Implementation in progress
-# 1.7.8 Ensure GDM autorun-never is enabled (Automated) --- Implementation in progress
-# 1.7.9 Ensure GDM autorun-never is not overriden (Automated) --- Implementation in progress
-# 1.7.10 Ensure XDMCP is not enabled (Automated) --- Implementation in progress
+# 1.7.6 Ensure GDM automatic mounting of removable media is disabled. (Automated) --- Implementation in progress
+# 1.7.7 Ensure GDM disabling automatic mountig of removable media is not overriden. (Automated) --- Implementation in progress
+# 1.7.8 Ensure GDM autorun-never is enabled. (Automated) --- Implementation in progress
+# 1.7.9 Ensure GDM autorun-never is not overriden. (Automated) --- Implementation in progress
+# 1.7.10 Ensure XDMCP is not enabled. (Automated) --- Implementation in progress
 
 
 # 2 - Services
@@ -1444,7 +1444,7 @@ checks:
 #
 #
 
-# 2.1.1 Ensure autofs service are not in use (Automated)
+# 2.1.1 Ensure autofs service are not in use. (Automated)
   - id: 211
     title: "Ensure autofs services are not in use."
     description: "autofs allows automatic mounting of devices, typically including CD/DVDs and USB drives."
@@ -1968,7 +1968,7 @@ checks:
     rules:
       - 'not c:dpkg-query -W -f="\${Status}\n" xserver-common -> r:^install ok installed$'
 
-# 2.1.21 Ensure mail transfer agent is configured for local-only mode (Automated)
+# 2.1.21 Ensure mail transfer agent is configured for local-only mode. (Automated)
   - id: 2121
     title: "Ensure mail transfer agent is configured for local-only mode"
     description: "Mail Transfer Agents (MTA), such as sendmail and Postfix, are used to listen for incoming mail and transfer messages to the appropriate user or mail server. If the system is not intended to be a mail server, it is recommended that the MTA be configured to only process local mail."
@@ -1991,12 +1991,184 @@ checks:
       - 'not c:ss -plntu | grep -E -- ":587\b" -> !r:127\.0\.0\.1: && !r:\[::1\]:'
       - 'f:/etc/postfix/main.cf -> r:^[^#;]\*inet_interfaces\s*=\s*loopback-only\b'
 
-# 2.1.22 Ensure only approved services are listening on a network interface (Manual)
-# This rule is currently not implementable because it requires human intervention
+# 2.1.22 Ensure only approved services are listening on a network interface. (Manual)
+# This rule is currently not implementable because it requires human intervention.
 
 
-# 2.2 - Configure Client Services
+# 2.2 - Configure Client Services.
 #
 #
 
-# 2.2.1
+# 2.2.1 Ensure NIS Client is not installed. (Automated)
+  - id: 221
+    title: "Ensure NIS Client is not installed."
+    description: "The Network Information Service (NIS), formerly known as Yellow Pages, is a client-server directory service protocol used to distribute system configuration files. The NIS client was used to bind a machine to an NIS server and receive the distributed configuration files."
+    rationale: "The NIS service is inherently an insecure system that has been vulnerable to DOS attacks, buffer overflows and has poor authentication for querying NIS maps. NIS generally has been replaced by such protocols as Lightweight Directory Access Protocol (LDAP). It is recommended that the service be removed."
+    impact: "Many insecure service clients are used as troubleshooting tools and in testing environments. Uninstalling them can inhibit capability to test and troubleshoot. If they are required it is advisable to remove the clients after use to prevent accidental or intentional misuse."
+    remediation: "Uninstall nis: # apt purge nis."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.2.1"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["2.6"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.12.5.1", "A.12.6.2"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" nis -> r:^install ok installed$'
+
+ # 2.2.2 Ensure rsh client is not installed. (Automated)
+  - id: 222
+    title: "Ensure rsh client is not installed."
+    description: "The rsh-client package contains the client commands for the rsh services."
+    rationale: "These legacy clients contain numerous security exposures and have been replaced with the more secure SSH package. Even if the server is removed, it is best to ensure the clients are also removed to prevent users from inadvertently attempting to use these commands and therefore exposing their credentials. Note that removing the rsh-client package removes the clients for rsh , rcp and rlogin."
+    impact: "Many insecure service clients are used as troubleshooting tools and in testing environments. Uninstalling them can inhibit capability to test and troubleshoot. If they are required it is advisable to remove the clients after use to prevent accidental or intentional misuse."
+    remediation: "Uninstall rsh: # apt purge rsh-client."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.2.2"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1041", "M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1040", "T1203", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" rsh-client -> r:^install ok installed$'
+
+# 2.2.3 Ensure talk client is not installed. (Automated)
+  - id: 223
+    title: "Ensure talk client is not installed."
+    description: "The talk software makes it possible for users to send and receive messages across systems through a terminal session. The talk client, which allows initialization of talk sessions, is installed by default."
+    rationale: "The software presents a security risk as it uses unencrypted protocols for communication."
+    impact: "Many insecure service clients are used as troubleshooting tools and in testing environments. Uninstalling them can inhibit capability to test and troubleshoot. If they are required it is advisable to remove the clients after use to prevent accidental or intentional misuse."
+    remediation: "Uninstall talk: # apt purge talk."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.2.3"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1041", "M1042"]
+      - mitre_tactics: ["TA0006", "TA0008"]
+      - mitre_techniques: ["T1203", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" talk -> r:^install ok installed$'
+
+# 2.2.4 Ensure telnet client is not installed. (Automated)
+  - id: 224
+    title: "Ensure telnet client is not installed."
+    description: "The inetutils-telnet package contains the telnet client, which allows users to start connections to other systems via the telnet protocol."
+    rationale: "The telnet protocol is insecure and unencrypted. The use of an unencrypted transmission medium could allow an unauthorized user to steal credentials. The ssh package provides an encrypted session and stronger security and is included in most Linux distributions."
+    impact: "Many insecure service clients are used as troubleshooting tools and in testing environments. Uninstalling them can inhibit capability to test and troubleshoot. If they are required it is advisable to remove the clients after use to prevent accidental or intentional misuse."
+    remediation: "Run the following commands to uninstall telnet & inetutils-telnet: # apt purge telnet # apt purge inetutils-telnet."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.2.4"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1041", "M1042"]
+      - mitre_tactics: ["TA0006", "TA0008"]
+      - mitre_techniques: ["T1040", "T1203", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" telnet inetutils-telnet -> r:^install ok installed$'
+
+# 2.2.5 Ensure ldap client is not installed. (Automated)
+  - id: 225
+    title: "Ensure ldap client is not installed."
+    description: "The Lightweight Directory Access Protocol (LDAP) was introduced as a replacement for NIS/YP. It is a service that provides a method for looking up information from a central database."
+    rationale: "If the system will not need to act as an LDAP client, it is recommended that the software be removed to reduce the potential attack surface."
+    impact: "Removing the LDAP client will prevent or inhibit using LDAP for authentication in your environment."
+    remediation: "Uninstall ldap-utils: # apt purge ldap-utils."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.2.5"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" ldap-utils -> r:^install ok installed$'
+  
+# 2.2.6 Ensure ftp client is not installed. (Automated)
+  - id: 226
+    title: "Ensure ftp client is not installed."
+    description: "tnftp an enhanced FTP client, is the user interface to the Internet standard File Transfer Protocol. The program allows a user to transfer files to and from a remote network site."
+    rationale: "Unless there is a need to run the system using Internet standard File Transfer Protocol (for example, to allow anonymous downloads), it is recommended that the package be removed to reduce the potential attack surface."
+    remediation: "Run the following commands to uninstall tnftp & ftp: # apt purge ftp # apt purge tnftp."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.2.6"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" ftp tftp -> r:^install ok installed$'
+
+# 2.3 - Configure Time Synchronization
+# 2.3.1 - Ensure time synchronization is in use
+#
+#
+
+# 2.3.1.1 Ensure a single time synchronization daemon is in use. (Automated)
+  - id: 2311
+    title: "Ensure a signle time synchronization daemon is in use (Test for chrony)"
+    description: "System time should be synchronized between all systems in an environment. This is typically done by establishing an authoritative time server or a set of servers and having all systems synchronize their clocks to them. NOTE: Only ONE time synchronization method should be in use on the system. Configuring multiple time synchronization methods could lead to unexpected or unreliable results."
+    rationale: "Time synchronization is important to support time sensitive security mechanisms and ensures log files have consistent time records across the enterprise, which aids in forensic investigations."
+    remediation: "On physical system, and virtual systems where host based time synchronization is not available. Select ONE of the two time synchronization daemons; chrony or systemd-timesyncd and following the remediation procedure for the selected daemon. Run the following command to install chrony: # apt install chrony. Run the following commands to stop and mask the systemd-timesyncd daemon: systemctl stop systemd-timesyncd.service # systemctl mask systemd-timesyncd.service"
+    level: "Level 1"
+    compliance:
+      - cis: ["2.3.1.1"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - nist_sp_800-53: ["AU-3", "AU-12"]
+      - mitre_mitigations: [""]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
+    condition: any
+    rules:
+      - checks:
+      condition: all
+        - 'c:dpkg-query -W -f="\${Status}\n" chrony -> r:^install ok installed$'
+        - 'not c:systemctl is-enabled systemd-timesyncd.service -> r:^enabled$'
+        - 'not c:systemctl is-active systemd-timesyncd.service -> r:^active$'
+      - checks:
+      condition: all
+        - 'not c:dpkg-query -W -f="\${Status}\n" chrony -> r:^install ok installed$'
