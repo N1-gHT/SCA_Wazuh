@@ -1352,4 +1352,651 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - "not c:dpkg-query -s gdm3 -> r:install ok installed"
+      - 'not c:dpkg-query -W -f="\${Status}\n" gdm3 -> r:^install ok installed$'
+
+# 1.7.2 Ensure GDM login banner is configured (Automated)
+  - id: 172
+    title: "Ensure GDM login banner is configured"
+    description: "GDM is the Gnome Display Manager which handles graphic login for GNOME based systems."
+    rationale: "Warnin messages inform users who are attempting to login to the system of their legal status regarding th system and must include the name of the organization that owns the system and any monitoring policies that are in place."
+    impact:
+    remediation: "IF A user profile is already created run the following commands to set and enable the text banner message on login screen: # cgsettings set org.gnome.login-screen banner-message-text 'Authorized uses only. All activity may be monitored and reported' # gsettings set org.gnome.login-screen banner-message-enable true. OR A user profile does not existe, create or edit the gdm profile in the /etc/dconf/profile/gdm with the following lines : # user-db:user system-db:gdm file-db:/usr/share/gdm/greeter-dconf-defaults. Create a gdm keyfile for machine-wide settings in /etc/dconf/db/gdm.d/01-banner-message : [org/gnome/login-screen] banner-message-enable=true banner-message-text='Type the banner message here.' Then update the system databases : # dconf update."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.7.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1028"]
+      - mitre_tactics: ["TA0007"]
+      - mitre_techniques: ["T1078", "T1078.001", "T1078.002", "T1078.003", "T1087", "T1087.001", "T1087.002"]
+    condition: all
+    rules:
+      - 'c:gsettings get org.gnome.login-screen banner-message-enable -> r:^true$'
+      - 'not c:gsettings get org.gnome.login-screen banner-message-text -> r:^''''$'
+
+# 1.7.3 Ensure GDM disable-user-list option is enabled (Automadted)
+  - id: 173
+    title: "Ensure GDM disable-user-list is enabled"
+    description: "GDM is the Gnome Display Manager which handles graphic login for GNOME based systems. The disable-user-list options control if a list of users is displayed on the login screen."
+    rationale: "Displaying the user list eliminates half of the Userid/Password equation that an unauthorized person would need to log on."
+    impact:
+    remediation: "IF a user profile exists run the following command to enable the disblae-user-list: # gsettings set org.gnome.login-screen disable-user-list true. OR a user profile does not existe, create or edit the gdm profile in /etc/dconf/profile.gdm with the following lines: # user-db:user system-db:gdm file-db:/usr/share/gdm/greeter-dconf-defaults. Create a gdm keyfile for machine-wide settings in /etc/dconf/db/gdm.d/00-login-screen: [org/gnome/login-screen] disable-user-list=true. The update the system databases: # dconf update."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.7.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1028"]
+      - mitre_tactics: ["TA0007"]
+      - mitre_techniques: ["T1078", "T1078.001", "T1078.002", "T1078.003", "T1087", "T1087.001", "T1087.002"]
+    condition: all
+    rules:
+      - 'c:gsettings get org.gnome.login-screen disable-user-list -> r:^true$'
+
+# 1.7.4 Ensure GDM screen locks when the user is idle (Automated)
+  - id: 174
+    title: "Ensure GDM screen locks when the user is idle."
+    description: "GNOME Desktop Manager can make the screen lock automatically whenever the user is idle for some amount of time."
+    rationale: "Settings a lock-out value reduces the window of opportunity for unauthorized user access to another user's session that has been left unattended."
+    impact:
+    remediation: "IF a user profile is already created run the following commands enable screen locks when the user is idle: # gsettings set org.gnome.desktop.screensaver lock-delay 5 # gsettings set org.gnome.desktop.session idle-delay 900. IF a user profile does not exist, create or edit the user profile in the /etc/dconf/profile/ and verify it includes the following: # user-db:user system-db:{NAME_OF_DCONF_DATABASE}. Create the directory /etc/dconf/dc/local.d/ if it doesn't existe. Create the keyfile /etc/dconf/db/local.d/00-screensaver to provide information for the local database. Exemple key file : # Specify the dconf path [org/gnome/desktop/session] # Number of seconds of inactivity before the screen goes blank # Set to 0 seconds if you want to deactivate the screensaver. idle-delay=uint32 180 # Specify the dconf path [org/gnome/desktop/screensaver] # Number of seconds after the screen is blank before locking the screen lock-delay=uint32 0. Then run the following command to update the system databases: # dconf update."
+    level: "Level 1"
+    compliance: 
+      - cis: ["1.7.4"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["16.11"]
+      - mitre_mitigations: ["M1012"]
+      - mitre_tactics: ["TA0027"]
+      - mitre_techniques: ["T1461"]
+    condition: all
+    rules:
+      - 'c:gsettings get org.gnome.desktop.screensaver lock-delay  | awk ''{print $2}'' -> n:<= 5'
+      - 'c:gsettings get org.gnome.desktop.session idle-delay | awk ''{print $2}'' -> n:<= 900'
+
+# 1.7.5 Ensure GDM screen locks cannot be overriden (Automated)
+  - id: 175
+    title: "Ensure GDM scree, locks cannot be overridden."
+    description: "GNOME Desktop Manager can lock down specific settings by using the lockdown mode in dconf to prevent users from changing specific settings. To lock down a dconf key or subpath, create a locks subdirectory in the keyfile directory. The files inside this directory contain a list of keys or subpaths to lock. Just as with the keyfiles, you may add any number of files to this directory."
+    rationale: "Setting a lock-out value reduces the window of opportunity for unauthorized user access to another user's session that has been left unattended. Without locking down the system settings, user settings take precedence over the system settings."
+    impact:
+    remediation: "To prevent the user from overriding these settings, create a file /etc/dconf/db/local.d/00-screensaver with the following content: # /org/gnome/desktop/session/idle-delay # /org/gnome/desktop/screensaver/lock-delay. The update the system database : # dconf update."
+    level: "Level 1"
+    compliance:
+      - cis: ["1.7.5"]
+      - nist_sp_800-53: ["CM-11"]
+      - cis_csc_v8: ["4.3"]
+      - cis_csc_v7: ["16.11"]
+      - mitre_mitigations: ["M1001"]
+      - mitre_tactics: ["TA0027"]
+      - mitre_techniques: ["T1456"]
+    condition: all
+    rules:
+      - 'f:/etc/dconf/db/local.d/locks/* -> r:^[^";]\s*/org/gnome/desktop/session/idle-delay\b'
+      - 'f:/etc/dconf/db/local.d/locks/* -> r:^[^";]\s*/org/gnome/desktop/screensaver/lock-delay\b'
+
+# 1.7.6 Ensure GDM automatic mounting of removable media is disabled (Automated) --- Implementation in progress
+# 1.7.7 Ensure GDM disabling automatic mountig of removable media is not overriden (Automated) --- Implementation in progress
+# 1.7.8 Ensure GDM autorun-never is enabled (Automated) --- Implementation in progress
+# 1.7.9 Ensure GDM autorun-never is not overriden (Automated) --- Implementation in progress
+# 1.7.10 Ensure XDMCP is not enabled (Automated) --- Implementation in progress
+
+
+# 2 - Services
+# 2.1 - Configure Server Services
+#
+#
+
+# 2.1.1 Ensure autofs service are not in use (Automated)
+  - id: 211
+    title: "Ensure autofs services are not in use."
+    description: "autofs allows automatic mounting of devices, typically including CD/DVDs and USB drives."
+    rationale: "With automounting enabled anyone with physical access could attach a USB drive or disc and have its contents available in the filesystem even if they lacked permissions to mount it themselves."
+    impact: "The use of portable hard drives is very common for workstation users. If your organization allows the use of portable storage or media on workstations and physical access controls to workstations is considered adequate there is little value add in turning off automounting. There may be packages that are dependent on the autofs package. If the autofs package is removed, these dependent packages will be removed as well. Before removing the autofs package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the autofs.service leaving the autofs package installed."
+    remediation: "Run the following commands to stop autofs.service and remove the autofs package: # systemctl stop autofs.service # apt purge autofs - OR - - IF - the autofs package is required as a dependency: Run the following commands to stop and mask autofs.service: # systemctl stop autofs.service # systemctl mask autofs.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.2"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" autofs -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled autofs.service -> r:^enabled$'
+      - 'not c:systemctl is-active autofs.service -> r:^active$'
+    
+# 2.1.2 Ensure avahi daemon services are not in use. (Automated)
+  - id: 212
+    title: "Ensure avahi daemon services are not in use."
+    description: "Avahi is a free zeroconf implementation, including a system for multicast DNS/DNS-SD service discovery. Avahi allows programs to publish and discover services and hosts running on a local network with no specific configuration. For example, a user can plug a computer into a network and Avahi automatically finds printers to print to, files to look at and people to talk to, as well as network services running on the machine."
+    rationale: "Automatic discovery of network services is not normally required for system functionality. It is recommended to remove this package to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the avahi package. If the avahi package is removed, these dependent packages will be removed as well. Before removing the avahi package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the avahi-daemon.socket and avahi-daemon.service leaving the avahi package installed."
+    remediation: "Run the following commands to stop avahi-daemon.socket and avahi-daemon.service, and remove the avahi-daemon package: # systemctl stop avahi-daemon.socket avahi-daemon.service # apt purge avahi-daemon - OR -- IF - the avahi-daemon package is required as a dependency: Run the following commands to stop and mask the avahi-daemon.socket and avahi-daemon.service: # systemctl stop avahi-daemon.socket avahi-daemon.service # systemctl mask avahi-daemon.socket avahi-daemon.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.2"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" avahi-daemon -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled avahi-daemon.socket avahi-daemon.service -> r:^enabled$'
+      - 'not c:systemctl is-active avahi-daemon.socket avahi-daemon.service -> r:^active$'
+
+# 2.1.3 Ensure dhcp server services are not in use. (Automated)
+  - id: 213
+    title: "Ensure dhcp server services are not in use."
+    description: "The Dynamic Host Configuration Protocol (DHCP) is a service that allows machines to be dynamically assigned IP addresses. There are two versions of the DHCP protocol DHCPv4 and DHCPv6. At startup the server may be started for one or the other via the -4 or -6 arguments."
+    rationale: "Unless a system is specifically set up to act as a DHCP server, it is recommended that this package be removed to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the isc-dhcp-server package. If the isc-dhcp-server package is removed, these dependent packages will be removed as well. Before removing the isc-dhcp-server package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the isc-dhcp-server.service and isc-dhcp-server6.service leaving the isc-dhcp-server package installed."
+    remediation: "Run the following commands to stop isc-dhcp-server.service and isc-dhcp- server6.service and remove the isc-dhcp-server package: # systemctl stop isc-dhcp-server.service isc-dhcp-server6.service # apt purge isc-dhcp-server - OR -- IF - the isc-dhcp-server package is required as a dependency: Run the following commands to stop and mask isc-dhcp-server.service and isc - dhcp-server6.service: # systemctl stop isc-dhcp-server.service isc-dhcp-server6.service # systemctl mask isc-dhcp-server isc-dhcp-server6.service."
+    references:
+      - "http://www.isc.org/software/dhcp."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.3"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" isc-dhcp-server -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled isc-dhcp-server.service isc-dhcp-server6.service -> r:^enabled$'
+      - 'not c:systemctl is-active isc-dhcp-server.service isc-dhcp-server6.service -> r:^active$'
+
+# 2.1.4 Ensure dns server services are not in use. (Automated)
+  - id: 214
+    title: "Ensure dns server services are not in use."
+    description: "The Domain Name System (DNS) is a hierarchical naming system that maps names to IP addresses for computers, services and other resources connected to a network. Note: bind9 is the package and bind.service is the alias for named.service."
+    rationale: "Unless a system is specifically designated to act as a DNS server, it is recommended that the package be deleted to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the bind9 package. If the bind9 package is removed, these dependent packages will be removed as well. Before removing the bind9 package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask named.service leaving the bind9 package installed."
+    remediation: "Run the following commands to stop named.service and remove the bind9 package: # systemctl stop named.service # apt purge bind9 - OR - - IF - the bind9 package is required as a dependency: Run the following commands to stop and mask bind9.service: # systemctl stop named.service # systemctl mask named.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.4"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" bind9 -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled named.service -> r:^enabled$'
+      - 'not c:systemctl is-active named.service -> r:^active$'
+
+
+# 2.1.5 Ensure dnsmasq services are not in use. (Automated)
+  - id: 215
+    title: "Ensure dnsmasq services are not in use."
+    description: "dnsmasq is a lightweight tool that provides DNS caching, DNS forwarding and DHCP (Dynamic Host Configuration Protocol) services."
+    rationale: "Unless a system is specifically designated to act as a DNS caching, DNS forwarding and/or DHCP server, it is recommended that the package be removed to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the dnsmasq package. If the dnsmasq package is removed, these dependent packages will be removed as well. Before removing the dnsmasq package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the dnsmasq.service leaving the dnsmasq package installed."
+    remediation: "Run the following commands to stop dnsmasq.service and remove dnsmasq package: # systemctl stop dnsmasq.service # apt purge dnsmasq - OR - - IF - the dnsmasq package is required as a dependency: Run the following commands to stop and mask the dnsmasq.service: # systemctl stop dnsmasq.service # systemctl mask dnsmasq.service."
+    compliance:
+      - cis: ["2.1.5"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" dnsmasq -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled dnsmasq.service -> r:^enabled$'
+      - 'not c:systemctl is-active dnsmasq.service -> r:^active$'
+
+
+# 2.1.6 Ensure ftp server services are not in use. (Automated)
+  - id: 216
+    title: "Ensure ftp server services are not in use."
+    description: "The File Transfer Protocol (FTP) provides networked computers with the ability to transfer files. vsftpd is the Very Secure File Transfer Protocol Daemon."
+    rationale: "FTP does not protect the confidentiality of data or authentication credentials. It is recommended SFTP be used if file transfer is required. Unless there is a need to run the system as a FTP server (for example, to allow anonymous downloads), it is recommended that the package be deleted to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the vsftpd package. If the vsftpd package is removed, these dependent packages will be removed as well. Before removing the vsftpd package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the vsftpd.service leaving the vsftpd package installed."
+    remediation: "Run the following commands to stop vsftpd.service and remove the vsftpd package: # systemctl stop vsftpd.service # apt purge vsftpd - OR - - IF - the vsftpd package is required as a dependency: Run the following commands to stop and mask the vsftpd.service: # systemctl stop vsftpd.service # systemctl mask vsftpd.service Note: Other ftp server packages may exist. If not required and authorized by local site policy, they should also be removed. If the package is required for a dependency, the service should be stopped and masked."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.6"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" vsftpd -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled vsftpd.service -> r:^enabled$'
+      - 'not c:systemctl is-active vsftpd.service -> r:^active$'
+
+# 2.1.7 Ensure ldap server services are not in use. (Automated)
+  - id: 217
+    title: "Ensure ldap server services are not in use."
+    description: "The Lightweight Directory Access Protocol (LDAP) was introduced as a replacement for NIS/YP. It is a service that provides a method for looking up information from a central database."
+    rationale: "If the system will not need to act as an LDAP server, it is recommended that the software be removed to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the slapd package. If the slapd package is removed, these dependent packages will be removed as well. Before removing the slapd package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the slapd.service leaving the slapd package installed."
+    remediation: "Run the following commands to stop slapd.service and remove the slapd package: # systemctl stop slapd.service # apt purge slapd - OR - - IF - the slapd package is required as a dependency: Run the following commands to stop and mask slapd.service: # systemctl stop slapd.service # systemctl mask slapd.service."
+    references:
+      - "http://www.openldap.org."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.7"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" slapd -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled slapd.service -> r:^enabled$'
+      - 'not c:systemctl is-active slapd.service -> r:^active$'
+
+# 2.1.8 Ensure message access server services are not in use. (Automated)
+  - id: 218
+    title: "Ensure message access server services are not in use."
+    description: "dovecot-imapd and dovecot-pop3d are an open source IMAP and POP3 server for Linux based systems."
+    rationale: "Unless POP3 and/or IMAP servers are to be provided by this system, it is recommended that the package be removed to reduce the potential attack surface. Note: Several IMAP/POP3 servers exist and can use other service names. These should also be audited and the packages removed if not required."
+    impact: "There may be packages that are dependent on dovecot-imapd and/or dovecot-pop3d packages. If dovecot-imapd and dovecot-pop3d packages are removed, these dependent packages will be removed as well. Before removing dovecot-imapd and/or dovecot-pop3d packages, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask dovecot.socket and dovecot.service leaving dovecot-imapd and/or dovecot-pop3d packages installed."
+    remediation: "Run one of the following commands to remove dovecot-imapd and dovecot-pop3d: Run the following commands to stop dovecot.socket and dovecot.service, and remove the dovecot-imapd and dovecot-pop3d packages: # systemctl stop dovecot.socket dovecot.service # apt purge dovecot-imapd dovecot-pop3d - OR - - IF - a package is installed and is required for dependencies: Run the following commands to stop and mask dovecot.socket and dovecot.service: # systemctl stop dovecot.socket dovecot.service # systemctl mask dovecot.socket dovecot.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.8"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" dovecot-imapd dovecot-pop3d -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled dovecot.socket dovecot.service -> r:^enabled$'
+      - 'not c:systemctl is-active dovecot.socket dovecot.service -> r:^active$'
+
+# 2.1.9 Ensure network file system services are not in use. (Automated)
+  - id: 219
+    title: "Ensure network file system services are not in use."
+    description: "The Network File System (NFS) is one of the first and most widely distributed file systems in the UNIX environment. It provides the ability for systems to mount file systems of other servers through the network."
+    rationale: "If the system does not export NFS shares, it is recommended that the nfs-kernel-server package be removed to reduce the remote attack surface."
+    impact: "There may be packages that are dependent on the nfs-kernel-server package. If the nfs-kernel-server package is removed, these dependent packages will be removed as well. Before removing the nfs-kernel-server package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the nfs-server.service leaving the nfs-kernel-server package installed."
+    remediation: "Run the following command to stop nfs-server.service and remove nfs-kernel- server package: # systemctl stop nfs-server.service # apt purge nfs-kernel-server - OR - - IF - the nfs-kernel-server package is required as a dependency: Run the following commands to stop and mask the nfs-server.service: # systemctl stop nfs-server.service # systemctl mask nfs-server.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.9"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1005", "T1039", "T1083", "T1135", "T1210"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" nfs-kernel-server -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled nfs-server.service -> r:^enabled$'
+      - 'not c:systemctl is-active nfs-server.service -> r:^active$'
+
+# 2.1.10 Ensure nis server services are not in use. (Automated)
+  - id: 2110
+    title: "Ensure nis server services are not in use."
+    description: "The Network Information Service (NIS) (formally known as Yellow Pages) is a client-server directory service protocol for distributing system configuration files. The NIS server is a collection of programs that allow for the distribution of configuration files. The NIS client (ypbind) was used to bind a machine to an NIS server and receive the distributed configuration files."
+    rationale: "ypserv.service is inherently an insecure system that has been vulnerable to DOS attacks, buffer overflows and has poor authentication for querying NIS maps. NIS generally has been replaced by such protocols as Lightweight Directory Access Protocol (LDAP). It is recommended that ypserv.service be removed and other, more secure services be used."
+    impact: "There may be packages that are dependent on the ypserv package. If the ypserv package is removed, these dependent packages will be removed as well. Before removing the ypserv package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the ypserv.service leaving the ypserv package installed."
+    remediation: "Run the following commands to stop ypserv.service and remove ypserv package: # systemctl stop ypserv.service # apt purge ypserv - OR - - IF - the ypserv package is required as a dependency: Run the following commands to stop and mask ypserv.service: # systemctl stop ypserv.service # systemctl mask ypserv.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.10"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" ypserv -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled ypserv.service -> r:^enabled$'
+      - 'not c:systemctl is-active ypserv.service -> r:^active$'
+
+# 2.1.11 Ensure print server services are not in use. (Automated)
+  - id: 2111
+    title: "Ensure print server services are not in use."
+    description: "The Common Unix Print System (CUPS) provides the ability to print to both local and network printers. A system running CUPS can also accept print jobs from remote systems and print them to local printers. It also provides a web based remote administration capability."
+    rationale: "If the system does not need to print jobs or accept print jobs from other systems, it is recommended that CUPS be removed to reduce the potential attack surface."
+    impact: "Removing the cups package, or disabling cups.socket and/or cups.service will prevent printing from the system, a common task for workstation systems. There may be packages that are dependent on the cups package. If the cups package is removed, these dependent packages will be removed as well. Before removing the cups package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask cups.socket and cups.service leaving the cups package installed."
+    remediation: "Run the following commands to stop cups.socket and cups.service, and remove the cups package: # systemctl stop cups.socket cups.service # apt purge cups - OR - - IF - the cups package is required as a dependency: Run the following commands to stop and mask the cups.socket and cups.service: # systemctl stop cups.socket cups.service # systemctl mask cups.socket cups.service."
+    references:
+      - "http://www.cups.org"
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.11"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" cups -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled cups.socket cups.service -> r:^enabled$'
+      - 'not c:systemctl is-active cups.socket cups.service -> r:^active$'
+
+# 2.1.12 Ensure rpcbind services are not in use. (Automated)
+  - id: 2112
+    title: "Ensure rpcbind services are not in use."
+    description: "The rpcbind utility maps RPC services to the ports on which they listen. RPC processes notify rpcbind when they start, registering the ports they are listening on and the RPC program numbers they expect to serve. The client system then contacts rpcbind on the server with a particular RPC program number. The rpcbind.service redirects the client to the proper port number so it can communicate with the requested service. Portmapper is an RPC service, which always listens on tcp and udp 111, and is used to map other RPC services (such as nfs, nlockmgr, quotad, mountd, etc.) to their corresponding port number on the server. When a remote host makes an RPC call to that server, it first consults with portmap to determine where the RPC server is listening."
+    rationale: "A small request (~82 bytes via UDP) sent to the Portmapper generates a large response (7x to 28x amplification), which makes it a suitable tool for DDoS attacks. If rpcbind is not required, it is recommended to remove rpcbind package to reduce the potential attack surface."
+    impact: "Many of the libvirt packages used by Enterprise Linux virtualization, and the nfs-utils package used for The Network File System (NFS), are dependent on the rpcbind package. If the rpcbind package is removed, these dependent packages will be removed as well. Before removing the rpcbind package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the rpcbind.socket and rpcbind.service leaving the rpcbind package installed."
+    remediation: "Run the following commands to stop rpcbind.socket and rpcbind.service, and remove the rpcbind package: # systemctl stop rpcbind.socket rpcbind.service # apt purge rpcbind - OR - - IF - the rpcbind package is required as a dependency: Run the following commands to stop and mask the rpcbind.socket and rpcbind.service: # systemctl stop rpcbind.socket rpcbind.service # systemctl mask rpcbind.socket rpcbind.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.12"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1498", "T1498.002", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" rpcbind -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled rpcbind.socket rpcbind.service -> r:^enabled$'
+      - 'not c:systemctl is-active rpcbind.socket rpcbind.service -> r:^active$'
+
+# 2.1.13 Ensure rsync services are not in use. (Automated)
+  - id: 2113
+    title: "Ensure rsync services are not in use."
+    description: "The rsync service can be used to synchronize files between systems over network links."
+    rationale: "rsync.service presents a security risk as the rsync protocol is unencrypted. The rsync package should be removed to reduce the attack area of the system."
+    impact: "There may be packages that are dependent on the rsync package. If the rsync package is removed, these dependent packages will be removed as well. Before removing the rsync package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask rsync.service leaving the rsync package installed."
+    remediation: "Run the following commands to stop rsync.service, and remove the rsync package: # systemctl stop rsync.service # apt purge rsync - OR - - IF - the rsync package is required as a dependency: Run the following commands to stop and mask rsync.service: # systemctl stop rsync.service # systemctl mask rsync.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.13"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1105", "T1203", "T1210", "T1543", "T1543.002", "T1570"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" rsync -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled rsync.service -> r:^enabled$'
+      - 'not c:systemctl is-active rsync.service -> r:^active$'
+
+# 2.1.14 Ensure samba file server services are not in use. (Automated)
+  - id: 2114
+    title: "Ensure samba file server services are not in use."
+    description: "The Samba daemon allows system administrators to configure their Linux systems to share file systems and directories with Windows desktops. Samba will advertise the file systems and directories via the Server Message Block (SMB) protocol. Windows desktop users will be able to mount these directories and file systems as letter drives on their systems."
+    rationale: "If there is no need to mount directories and file systems to Windows systems, then this service should be deleted to reduce the potential attack surface."
+    impact: "There may be packages that are dependent on the samba package. If the samba package is removed, these dependent packages will be removed as well. Before removing the samba package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the smbd.service leaving the samba package installed."
+    remediation: "Run the following commands to stop smbd.service and remove samba package: # systemctl stop smbd.service # apt purge samba - OR - - IF - the samba package is required as a dependency: Run the following commands to stop and mask the smbd.service: # systemctl stop smbd.service # systemctl mask smbd.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.14"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1005", "T1039", "T1083", "T1135", "T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" samba -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled smbd.service -> r:^enabled$'
+      - 'not c:systemctl is-active smbd.service -> r:^active$'
+
+# 2.1.15 Ensure snmp services are not in use. (Automated)
+  - id: 2115
+    title: "Ensure snmp services are not in use."
+    description: 'Simple Network Management Protocol (SNMP) is a widely used protocol for monitoring the health and welfare of network equipment, computer equipment and devices like UPSs. Net-SNMP is a suite of applications used to implement SNMPv1 (RFC 1157), SNMPv2 (RFCs 1901-1908), and SNMPv3 (RFCs 3411-3418) using both IPv4 and IPv6. Support for SNMPv2 classic (a.k.a. "SNMPv2 historic" - RFCs 1441-1452) was dropped with the 4.0 release of the UCD-snmp package. The Simple Network Management Protocol (SNMP) server is used to listen for SNMP commands from an SNMP management system, execute the commands or collect the information and then send results back to the requesting system.'
+    rationale: "The SNMP server can communicate using SNMPv1, which transmits data in the clear and does not require authentication to execute commands. SNMPv3 replaces the simple/clear text password sharing used in SNMPv2 with more securely encoded parameters. If the the SNMP service is not required, the snmpd package should be removed to reduce the attack surface of the system. Note: If SNMP is required: - The server should be configured for SNMP v3 only. User Authentication and Message Encryption should be configured. If SNMP v2 is absolutely necessary, modify the community strings' values. -."
+    impact: "There may be packages that are dependent on the snmpd package. If the snmpd package is removed, these packages will be removed as well. Before removing the snmpd package, review any dependent packages to determine if they are required on the system. If a dependent package is required, stop and mask the snmpd.service leaving the snmpd package installed."
+    remediation: "Run the following commands to stop snmpd.service and remove the snmpd package: # systemctl stop snmpd.service # apt purge snmpd - OR - If the package is required for dependencies: Run the following commands to stop and mask the snmpd.service: # systemctl stop snmpd.service # systemctl mask snmpd.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.15"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" snmpd -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled snmpd.service -> r:^enabled$'
+      - 'not c:systemctl is-active snmpd.service -> r:^active$'
+
+# 2.1.16 Ensure tftp server services are not in use. (Automated)
+  - id: 2116
+    title: "Ensure tftp server services are not in use."
+    description: "Trivial File Transfer Protocol (TFTP) is a simple protocol for exchanging files between two TCP/IP machines. TFTP servers allow connections from a TFTP Client for sending and receiving files."
+    rationale: "Unless there is a need to run the system as a TFTP server, it is recommended that the package be removed to reduce the potential attack surface. TFTP does not have built-in encryption, access control or authentication. This makes it very easy for an attacker to exploit TFTP to gain access to files."
+    impact: "TFTP is often used to provide files for network booting such as for PXE based installation of servers. There may be packages that are dependent on the tftpd-hpa package. If the tftpd-hpa package is removed, these dependent packages will be removed as well. Before removing the tftpd-hpa package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask tftpd-hpa.service leaving the tftpd-hpa package installed."
+    remediation: "Run the following commands to stop tftpd-hpa.service, and remove the tftpd-hpa package: # systemctl stop tftpd-hpa.service # apt purge tftpd-hpa - OR - - IF - the tftpd-hpa package is required as a dependency: Run the following commands to stop and mask tftpd-hpa.service: # systemctl stop tftpd-hpa.service # systemctl mask tftpd-hpa.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.16"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" tftpd-hpa -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled tftpd-hpa.service -> r:^enabled$'
+      - 'not c:systemctl is-active tftpd-hpa.service -> r:^active$'
+
+# 2.1.17 Ensure web proxy server services are not in use. (Automated)
+  - id: 2117
+    title: "Ensure web proxy server services are not in use."
+    description: "Squid is a standard proxy server used in many distributions and environments."
+    rationale: "Unless a system is specifically set up to act as a proxy server, it is recommended that the squid package be removed to reduce the potential attack surface. Note: Several HTTP proxy servers exist. These should be checked and removed unless required."
+    impact: "There may be packages that are dependent on the squid package. If the squid package is removed, these dependent packages will be removed as well. Before removing the squid package, review any dependent packages to determine if they are required on the system. - IF - a dependent package is required: stop and mask the squid.service leaving the squid package installed."
+    remediation: "Run the following commands to stop squid.service and remove the squid package: # systemctl stop squid.service # apt purge squid - OR - If the squid package is required as a dependency: Run the following commands to stop and mask the squid.service: # systemctl stop squid.service # systemctl mask squid.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.17"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" squid -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled squid.service -> r:^enabled$'
+      - 'not c:systemctl is-active squid.service -> r:^active$'
+
+# 2.1.18 Ensure web server services are not in use. (Automated)
+  - id: 2118
+    title: "Ensure web server services are not in use."
+    description: "Web servers provide the ability to host web site content."
+    rationale: "Unless there is a local site approved requirement to run a web server service on the system, web server packages should be removed to reduce the potential attack surface."
+    impact: "Removal of web server packages will remove that ability for the server to host web services. - IF - the web server package is required for a dependency, any related service or socket should be stopped and masked. Note: If the remediation steps to mask a service are followed and that package is not installed on the system, the service and/or socket will still be masked. If the package is installed due to an approved requirement to host a web server, the associated service and/or socket would need to be unmasked before it could be enabled and/or started."
+    remediation: "Run the following commands to stop httpd.socket, httpd.service, and nginx.service, and remove apache2 and nginx packages: # systemctl stop apache2.socket apache2.service nginx.service # apt purge apache2 nginx - OR - - IF - a package is installed and is required for dependencies: Run the following commands to stop and mask apache2.socket, apache2.service, and nginx.service: # systemctl stop apache2.socket apache2.service nginx.service # systemctl mask apache2.socket apache2.service nginx.service Note: Other web server packages may exist. If not required and authorized by local site policy, they should also be removed. If the package is required for a dependency, the service and socket should be stopped and masked."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.18"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" apache2 -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled apache2.service apache2.socket -> r:^enabled$'
+      - 'not c:systemctl is-active apache2.service apache2.socket -> r:^active$'
+
+# 2.1.19 Ensure xinetd services are not in use. (Automated)
+  - id: 2119
+    title: "Ensure xinetd services are not in use."
+    description: "The eXtended InterNET Daemon (xinetd) is an open source super daemon that replaced the original inetd daemon. The xinetd daemon listens for well known services and dispatches the appropriate daemon to properly respond to service requests."
+    rationale: "If there are no xinetd services required, it is recommended that the package be removed to reduce the attack surface are of the system. Note: If an xinetd service or services are required, ensure that any xinetd service not required is stopped and masked."
+    impact: "There may be packages that are dependent on the xinetd package. If the xinetd package is removed, these dependent packages will be removed as well. Before removing the xinetd package, review any dependent packages to determine if they are required on the system. -IF- a dependent package is required: stop and mask xinetd.service leaving the xinetd package installed."
+    remediation: "Run the following commands to stop xinetd.service, and remove the xinetd package: # systemctl stop xinetd.service # apt purge xinetd -OR- -IF- the xinetd package is required as a dependency: Run the following commands to stop and mask the xinetd.service: # systemctl stop xinetd.service # systemctl mask xinetd.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.19"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" xinetd -> r:^install ok installed$'
+      - 'not c:systemctl is-enabled xinetd.service -> r:^enabled$'
+      - 'not c:systemctl is-active xinetd.service apache2.socket -> r:^active$'
+
+# 2.1.20 Ensure X window server services are not in use. (Automated)
+  - id: 2120
+    title: "Ensure X window server services are not in use."
+    description: "The X Window System provides a Graphical User Interface (GUI) where users can have multiple windows in which to run programs and various add on. The X Windows system is typically used on workstations where users login, but not on servers where users typically do not login."
+    rationale: "Unless your organization specifically requires graphical login access via X Windows, remove it to reduce the potential attack surface."
+    impact: 'If a Graphical Desktop Manager (GDM) is in use on the system, there may be a dependency on the xorg-x11-server-common package. If the GDM is required and approved by local site policy, the package should not be removed. Many Linux systems run applications which require a Java runtime. Some Linux Java packages have a dependency on specific X Windows xorg-x11-fonts. One workaround to avoid this dependency is to use the "headless" Java packages for your specific Java runtime.'
+    remediation: "- IF - a Graphical Desktop Manager or X-Windows server is not required and approved by local site policy: Run the following command to remove the X Windows Server package: # apt purge xserver-common."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.20"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["2.6"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.12.5.1", "A.12.6.2"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1203", "T1210", "T1543", "T1543.002"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}\n" xserver-common -> r:^install ok installed$'
+
+# 2.1.21 Ensure mail transfer agent is configured for local-only mode (Automated)
+  - id: 2121
+    title: "Ensure mail transfer agent is configured for local-only mode"
+    description: "Mail Transfer Agents (MTA), such as sendmail and Postfix, are used to listen for incoming mail and transfer messages to the appropriate user or mail server. If the system is not intended to be a mail server, it is recommended that the MTA be configured to only process local mail."
+    rationale: "The software for all Mail Transfer Agent is complex and most have a long history of security issues. While it is important to ensure that the system car process local mail messages, it is not necessary to have the MTA's daemon listening on a port unless the server is intended to be a mail server that receives and processes mail from other systems."
+    impact: ""
+    remediation: "Edit /etc/postfix/main.cf and add the following line to the RECEIVING MAIL section. If tthe line is already exists, change it to look like the line below: # inet_interfaces = loopback-only. Run the following command to restart postfix: # systemctl restart postfix."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.1.21"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-7"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1018", "T1018.000", "T1210", "T1210.000"]
+    condition: all
+    rules:
+      - 'not c:ss -plntu | grep -E -- ":25\b" -> !r:127\.0\.0\.1: && !r:\[::1\]:'
+      - 'not c:ss -plntu | grep -E -- ":465\b" -> !r:127\.0\.0\.1: && !r:\[::1\]:'
+      - 'not c:ss -plntu | grep -E -- ":587\b" -> !r:127\.0\.0\.1: && !r:\[::1\]:'
+      - 'f:/etc/postfix/main.cf -> r:^[^#;]\*inet_interfaces\s*=\s*loopback-only\b'
+
+# 2.1.22 Ensure only approved services are listening on a network interface (Manual)
+# This rule is currently not implementable because it requires human intervention
+
+
+# 2.2 - Configure Client Services
+#
+#
+
+# 2.2.1
