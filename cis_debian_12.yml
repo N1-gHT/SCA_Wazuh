@@ -1302,7 +1302,7 @@ checks:
       - 'c:stat -L "%n %a %u %U %g %G" /etc/issue -> r:0 root 0 root && r:644|640|600|400'
 
 # 1.6.6 Ensure access to /etc/issue.net is configured. (Automated)
-  - id: 33053
+  - id: 166
     title: "Ensure access to /etc/issue.net is configured."
     description: "The contents of the /etc/issue.net file are displayed to users prior to login for remote connections from configured services."
     rationale: "- IF - the /etc/issue.net file does not have the correct access configured, it could be modified by unauthorized users with incorrect or misleading information."
@@ -1352,7 +1352,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" gdm3 -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" gdm3 -> r:^install ok installed$'
 
 # 1.7.2 Ensure GDM login banner is configured. (Automated)
   - id: 172
@@ -1466,7 +1466,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" autofs -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" autofs -> r:^install ok installed$'
       - 'not c:systemctl is-enabled autofs.service -> r:^enabled$'
       - 'not c:systemctl is-active autofs.service -> r:^active$'
     
@@ -1492,7 +1492,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" avahi-daemon -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" avahi-daemon -> r:^install ok installed$'
       - 'not c:systemctl is-enabled avahi-daemon.socket avahi-daemon.service -> r:^enabled$'
       - 'not c:systemctl is-active avahi-daemon.socket avahi-daemon.service -> r:^active$'
 
@@ -1520,7 +1520,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" isc-dhcp-server -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" isc-dhcp-server -> r:^install ok installed$'
       - 'not c:systemctl is-enabled isc-dhcp-server.service isc-dhcp-server6.service -> r:^enabled$'
       - 'not c:systemctl is-active isc-dhcp-server.service isc-dhcp-server6.service -> r:^active$'
 
@@ -1546,7 +1546,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" bind9 -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" bind9 -> r:^install ok installed$'
       - 'not c:systemctl is-enabled named.service -> r:^enabled$'
       - 'not c:systemctl is-active named.service -> r:^active$'
 
@@ -1572,7 +1572,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" dnsmasq -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" dnsmasq -> r:^install ok installed$'
       - 'not c:systemctl is-enabled dnsmasq.service -> r:^enabled$'
       - 'not c:systemctl is-active dnsmasq.service -> r:^active$'
 
@@ -1599,7 +1599,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" vsftpd -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" vsftpd -> r:^install ok installed$'
       - 'not c:systemctl is-enabled vsftpd.service -> r:^enabled$'
       - 'not c:systemctl is-active vsftpd.service -> r:^active$'
 
@@ -1627,7 +1627,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" slapd -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" slapd -> r:^install ok installed$'
       - 'not c:systemctl is-enabled slapd.service -> r:^enabled$'
       - 'not c:systemctl is-active slapd.service -> r:^active$'
 
@@ -1653,7 +1653,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" dovecot-imapd dovecot-pop3d -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" dovecot-imapd dovecot-pop3d -> r:^install ok installed$'
       - 'not c:systemctl is-enabled dovecot.socket dovecot.service -> r:^enabled$'
       - 'not c:systemctl is-active dovecot.socket dovecot.service -> r:^active$'
 
@@ -1679,7 +1679,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" nfs-kernel-server -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" nfs-kernel-server -> r:^install ok installed$'
       - 'not c:systemctl is-enabled nfs-server.service -> r:^enabled$'
       - 'not c:systemctl is-active nfs-server.service -> r:^active$'
 
@@ -1705,7 +1705,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" ypserv -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" ypserv -> r:^install ok installed$'
       - 'not c:systemctl is-enabled ypserv.service -> r:^enabled$'
       - 'not c:systemctl is-active ypserv.service -> r:^active$'
 
@@ -1733,7 +1733,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" cups -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" cups -> r:^install ok installed$'
       - 'not c:systemctl is-enabled cups.socket cups.service -> r:^enabled$'
       - 'not c:systemctl is-active cups.socket cups.service -> r:^active$'
 
@@ -1759,7 +1759,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" rpcbind -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" rpcbind -> r:^install ok installed$'
       - 'not c:systemctl is-enabled rpcbind.socket rpcbind.service -> r:^enabled$'
       - 'not c:systemctl is-active rpcbind.socket rpcbind.service -> r:^active$'
 
@@ -1785,7 +1785,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" rsync -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" rsync -> r:^install ok installed$'
       - 'not c:systemctl is-enabled rsync.service -> r:^enabled$'
       - 'not c:systemctl is-active rsync.service -> r:^active$'
 
@@ -1810,7 +1810,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" samba -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" samba -> r:^install ok installed$'
       - 'not c:systemctl is-enabled smbd.service -> r:^enabled$'
       - 'not c:systemctl is-active smbd.service -> r:^active$'
 
@@ -1836,7 +1836,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" snmpd -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" snmpd -> r:^install ok installed$'
       - 'not c:systemctl is-enabled snmpd.service -> r:^enabled$'
       - 'not c:systemctl is-active snmpd.service -> r:^active$'
 
@@ -1862,7 +1862,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" tftpd-hpa -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" tftpd-hpa -> r:^install ok installed$'
       - 'not c:systemctl is-enabled tftpd-hpa.service -> r:^enabled$'
       - 'not c:systemctl is-active tftpd-hpa.service -> r:^active$'
 
@@ -1888,7 +1888,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" squid -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" squid -> r:^install ok installed$'
       - 'not c:systemctl is-enabled squid.service -> r:^enabled$'
       - 'not c:systemctl is-active squid.service -> r:^active$'
 
@@ -1914,7 +1914,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" apache2 -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" apache2 -> r:^install ok installed$'
       - 'not c:systemctl is-enabled apache2.service apache2.socket -> r:^enabled$'
       - 'not c:systemctl is-active apache2.service apache2.socket -> r:^active$'
 
@@ -1940,7 +1940,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: any
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" xinetd -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" xinetd -> r:^install ok installed$'
       - 'not c:systemctl is-enabled xinetd.service -> r:^enabled$'
       - 'not c:systemctl is-active xinetd.service apache2.socket -> r:^active$'
 
@@ -1966,7 +1966,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" xserver-common -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" xserver-common -> r:^install ok installed$'
 
 # 2.1.21 Ensure mail transfer agent is configured for local-only mode. (Automated)
   - id: 2121
@@ -2021,7 +2021,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" nis -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" nis -> r:^install ok installed$'
 
  # 2.2.2 Ensure rsh client is not installed. (Automated)
   - id: 222
@@ -2045,7 +2045,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" rsh-client -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" rsh-client -> r:^install ok installed$'
 
 # 2.2.3 Ensure talk client is not installed. (Automated)
   - id: 223
@@ -2069,7 +2069,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" talk -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" talk -> r:^install ok installed$'
 
 # 2.2.4 Ensure telnet client is not installed. (Automated)
   - id: 224
@@ -2093,7 +2093,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" telnet inetutils-telnet -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" telnet inetutils-telnet -> r:^install ok installed$'
 
 # 2.2.5 Ensure ldap client is not installed. (Automated)
   - id: 225
@@ -2117,7 +2117,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" ldap-utils -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" ldap-utils -> r:^install ok installed$'
   
 # 2.2.6 Ensure ftp client is not installed. (Automated)
   - id: 226
@@ -2140,7 +2140,7 @@ checks:
       - soc_2: ["CC6.3", "CC6.6"]
     condition: all
     rules:
-      - 'not c:dpkg-query -W -f="\${Status}\n" ftp tftp -> r:^install ok installed$'
+      - 'not c:dpkg-query -W -f="\${Status}" ftp tftp -> r:^install ok installed$'
 
 # 2.3 - Configure Time Synchronization
 # 2.3.1 - Ensure time synchronization is in use
@@ -2162,13 +2162,105 @@ checks:
       - mitre_mitigations: [""]
       - mitre_tactics: ["TA0005"]
       - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
-    condition: any
+    condition: all
     rules:
-      - checks:
-      condition: all
-        - 'c:dpkg-query -W -f="\${Status}\n" chrony -> r:^install ok installed$'
+        - 'c:dpkg-query -W -f="\${Status}" chrony -> r:^install ok installed$'
         - 'not c:systemctl is-enabled systemd-timesyncd.service -> r:^enabled$'
         - 'not c:systemctl is-active systemd-timesyncd.service -> r:^active$'
-      - checks:
-      condition: all
-        - 'not c:dpkg-query -W -f="\${Status}\n" chrony -> r:^install ok installed$'
+
+# 2.3.1.1 Ensure a single time synchronization daemon is in use. (Automated)
+  - id: 23112
+    title: "Ensure a signle time synchronization daemon is in use (Test for systemd-timesyncd)"
+    description: "System time should be synchronized between all systems in an environment. This is typically done by establishing an authoritative time server or a set of servers and having all systems synchronize their clocks to them. NOTE: Only ONE time synchronization method should be in use on the system. Configuring multiple time synchronization methods could lead to unexpected or unreliable results."
+    rationale: "Time synchronization is important to support time sensitive security mechanisms and ensures log files have consistent time records across the enterprise, which aids in forensic investigations."
+    remediation: "On physical system, and virtual systems where host based time synchronization is not available. Select ONE of the two time synchronization daemons; chrony or systemd-timesyncd and following the remediation procedure for the selected daemon. Run the following command to remove chrony: # apt purge chrony # apt autoremove chrony."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.3.1.1"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - nist_sp_800-53: ["AU-3", "AU-12"]
+      - mitre_mitigations: [""]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
+    condition: all
+    rules:
+        - 'not c:dpkg-query -W -f="\${Status}" chrony -> r:^install ok installed$'
+        - 'c:systemctl is-enabled systemd-timesyncd.service -> r:^enabled$'
+        - 'c:systemctl is-active systemd-timesyncd.service -> r:^active$'
+
+# 2.3.2 - Configure systemd-timesyncd
+#
+#
+
+# 2.3.2.1 Ensure systemd-tilesyncd configured with authorized timeserver. (Automated)
+  - id: 2321
+    title: "Ensure systemd-timesyncd configured with authorized timeserver."
+    description: "NTP= - A space-separated list of NTP server hostnames or IP addresses. Systemd-timesyncd will contact all configured system or per-interface servers in turn, until one responds. This setting defaults to an empty list. FallbackNTP= - A space-separated list of NTP server hostnames or IP addresses to be used as the fallback NTP servers."
+    rationale: "Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
+    remediation: "Set NTP and/or FallbackNTP parameters to local site approved authoritative time server(s) in /Etc/systemd/timesyncd.conf or a file in /etc/systemd/timesyncd.conf.d/ ending in .conf in the [Time] section. NOTE if this setting appears in a canonnically later file, or later in the same file, the setting will be overwritten. Run the following command to update the paraeters in the service: # systemctl reload|restart systemd-timesyncd."
+    references:
+      - "https://www.freedesktop.org/software/systemd/man/timesyncd.conf.html"
+      - "https://tf.nist.gov/tf-cgi/servers.cgi"
+    level: "Level 1"
+    compliance:
+      - cis: ["2.3.2.1"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - nist_sp_800-53: ["AU-7", "AU-8"]
+    condition: all
+    rules:
+      - 'c:systemd-analyze cat-config systemd/timesyncd.conf | awk ''/^\s*NTP=/{line=$0} END{print line}'' -> r:^\s*NTP\s*=\s*\S+'
+      - 'c:systemd-analyze cat-config systemd/timesyncd.conf | awk ''/^\s*FallbackNTP=/{line=$0} END{print line}'' -> r:^\s*FallbackNTP\s*=\s*\S+'
+
+# 2.3.2.2 Ensure systemd-timesyncd is enabled and running. (Automated)
+  - id: 2322
+    title: "Ensure systemd-timesyncd is enabled and running."
+    description: "systemd-timesyncd is a daemon that has been added for synchronizing the system clock across the network."
+    rationale: "systemd-timesyncd needs to be enabled and running in order to synchronize the system to a timeserver. Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
+    remediation: "- IF - systemd-timesyncd is in use on the system, run the following commands: Run the following command to unmask systemd-timesyncd.service: # systemctl unmask systemd-timesyncd.service Run the following command to enable and start systemd-timesyncd.service: # systemctl --now enable systemd-timesyncd.service - OR - If another time synchronization service is in use on the system, run the following command to stop and mask systemd-timesyncd: # systemctl --now mask systemd-timesyncd.service."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.3.2.2"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - cmmc_v2.0: ["AU.L2-3.3.7"]
+      - iso_27001-2013: ["A.12.4.4"]
+      - mitre_mitigations: ["M1022"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
+      - nist_sp_800-53: ["AU-7"]
+      - pci_dss_v3.2.1: ["10.4"]
+      - pci_dss_v4.0: ["10.6", "10.6.1", "10.6.2", "10.6.3"]
+      - soc_2: ["CC4.1", "CC5.2"]
+    condition: all
+    rules:
+      - 'c:systemctl is-enabled systemd-timesyncd.service -> r:^enabled$'
+      - 'c:systemctl is-active systemd-timesyncd.service -> r:^active$'
+
+# 2.3.3 - Configure Chrony
+#
+#
+
+# 2.3.3.1 Ensure chrony is configured with authorized timeserver. (Automated)
+  - id: 2331
+    title: "Ensure chrony is configured with authorized timeserver"
+    description: "server - The server directive specifies an NTP server which can be used as a time source. The client-server relationship is strictly hierarchicaled. This directive can be used multiple time to specify multiple servers. The directive is immediately followed by either the name of the server or its IP address. pool - The syntax of this directive is similar to that for the server directive, except that is used to specify a pool of NTP servers rather than a single NTP server. The pool name is expected to resolve to multiple addresses which might change over time. This directive can be used multiple time to specify multiple servers. All options valide in the server directive can be used in this directive too."
+    rationale: "Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
+    remediation: "Edit /etc/chrony/chrony.conf or a file ending in .sources in /etc/chrony/sources.d and add or edit server or pool lines as appropriate according to local site policy. Edit the chrony configuration and add or edit the server and/or pool lines returned by the aduti procedure as appropriate according to local site policy."
+    references:
+      - "chrony.conf(5) Manual Page"
+      - "https://tf.nist.gov/tf-cgi/servers.cgi"
+    level: "Level 1"
+    compliance: 
+      - cis: ["2.3.3.1"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - nist_sp_800-53: ["AU-3", "AU-12"]
+      - mitre_mitigations: ["M1022"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
+    condition: all
+    rules:
+      - 'f:/etc/chrony/chrony.conf,/etc/chrony/sources.d/\S+.sources -> r:^[^#;]\s*server\s+\S+'
+      - 'f:/etc/chrony/chrony.conf,/etc/chrony/sources.d/\S+.sources -> r:^[^#;]\s*pool\s+\S+'
