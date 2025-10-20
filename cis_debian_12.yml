@@ -1107,7 +1107,7 @@ checks:
       - soc_2: ["CC5.2", "CC6.1"]
     condition: all
     rules:
-      - 'c:stat -Lc "%n %a %u %U %g %G" /boot/grub/grub.cfg -> r:0 root 0 root && r:600'
+      - 'c:stat -Lc "%a %u %U %g %G" /boot/grub/grub.cfg -> r:^600 0 root 0 root'
 
 # 1.5 - Configure additionnal Process Hardening
 #
@@ -1280,7 +1280,7 @@ checks:
     condition: any
     rules:
       - "not f:/etc/motd"
-      - 'c:stat -L "%n %a %u %U %g %G" /etc/motd -> r:0 root 0 root && r:644|640|600|400'
+      - 'c:stat -Lc " %a %u %U %g %G" /etc/motd -> r:^644 0 root 0 root$ || ^600 0 root 0 root$ || ^400 0 root 0 root$'
 
 # 1.6.5 Ensure access to /etc/issue is configured. (Automated)
   - id: 165
@@ -1305,7 +1305,7 @@ checks:
       - soc_2: ["CC5.2", "CC6.1"]
     condition: all
     rules:
-      - 'c:stat -L "%n %a %u %U %g %G" /etc/issue -> r:0 root 0 root && r:644|640|600|400'
+      - 'c:stat -Lc " %a %u %U %g %G" /etc/issue -> r:^644 0 root 0 root$ || ^600 0 root 0 root$ || ^400 0 root 0 root$'
 
 # 1.6.6 Ensure access to /etc/issue.net is configured. (Automated)
   - id: 166
@@ -1330,7 +1330,7 @@ checks:
       - soc_2: ["CC5.2", "CC6.1"]
     condition: all
     rules:
-      - 'c:stat -L "%n %a %u %U %g %G" /etc/issue.net -> r:0 root 0 root && r:644|640|600|400'
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/issue.net -> r:^644 0 root 0 root$ || ^600 0 root 0 root$ || ^400 0 root 0 root$'
 
 # 1.7 - Configure GNOME Display Manager
 #
@@ -2279,6 +2279,7 @@ checks:
     description: "The chrony package is installed with a dedicated user account _chrony. This account is granted the access required by the chronyd service."
     rationale: "The chronyd service should run with only the required privlidges."
     remediation: "Add or edit the user line to /etc/chrony/chrony.conf or a file ending in .conf in /etc/chrony/conf.d/: user _chrony - OR - If another time synchronization service is in use on the system, run the following command to remove chrony from the system: # apt purge chrony # apt autoremove chrony."
+    level: "Level 1"
     compliance:
       - cis: ["2.3.3.2"]
       - cis_csc_v8: ["8.4"]
@@ -2296,3 +2297,252 @@ checks:
     rules:
       - 'f:/etc/chrony/chrony.conf -> r:user\s*\t*_chrony'
       - 'd:/etc/chrony/conf.d/ -> r:.+\.conf$ -> r:user\s*\t*_chrony'
+
+# 2.3.3.3 Ensure chrony is enabled and running. (Automated)
+  - id: 2333
+    title: "Ensure chrony is enabled and running."
+    description: "chrony is a daemon for synchronizing the system clock across the network."
+    rationale: "chrony needs to be enabled and running in order to synchronize the system to a timeserver. Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
+    remediation: "- IF - chrony is in use on the system, run the following commands: Run the following command to unmask chrony.service: # systemctl unmask chrony.service Run the following command to enable and start chrony.service: # systemctl --now enable chrony.service - OR - If another time synchronization service is in use on the system, run the following command to remove chrony: # apt purge chrony # apt autoremove chrony."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.3.3.3"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - cmmc_v2.0: ["AU.L2-3.3.7"]
+      - iso_27001-2013: ["A.12.4.4"]
+      - mitre_mitigations: ["M1022"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
+      - nist_sp_800-53: ["AU-7"]
+      - pci_dss_v3.2.1: ["10.4"]
+      - pci_dss_v4.0: ["10.6", "10.6.1", "10.6.2", "10.6.3"]
+      - soc_2: ["CC4.1", "CC5.2"]
+    condition: all
+    rules:
+      - "c:systemctl is-enabled chrony.service -> r:^enabled$"
+      - "c:systemctl is-active chrony.service -> r:^active$"
+
+# 2.4.1 - Configure cron
+#
+#
+
+# 2.4.1.1 Ensure cron daemon is enabled and active. (Automated)
+  - id: 2411
+    title: "Ensure cron daemon is enabled and active."
+    description: "The cron daemon is used to execute batch jobs on the system."
+    rationale: "While there may not be user jobs that need to be run on the system, the system does have maintenance jobs that may include security monitoring that have to run, and cron is used to execute them."
+    remediation: "- IF - cron is installed on the system: Run the following commands to unmask, enable, and start cron: # systemctl unmask \"$(systemctl list-unit-files | awk '$1~/^crond?\\.service/{print $1}')\" # systemctl --now enable \"$(systemctl list-unit-files | awk '$1~/^crond?\\.service/{print $1}')\"."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1562", "T1562.001"]
+    condition: all
+    rules:
+      - 'c:systemctl list-unit-files | awk "\$1~/^crond?\.service/{print \$2}" -> r:^enabled$'
+      - 'c:systemctl list-units | awk "\$1~/^crond?\.service/{print \$3}" -> r:^active$'
+
+# 2.4.1.2 Ensure permissions on /etc/crontab are configured. (Automated)
+  - id: 2412
+    title: "Ensure permissions on /etc/crontab are configured."
+    description: "The /etc/crontab file is used by cron to control its own jobs. The commands in this item make sure that root is the user and group owner of the file and that only the owner can access the file."
+    rationale: "This file contains information on what system jobs are run by cron. Write access to these files could provide unprivileged users with the ability to elevate their privileges. Read access to these files could provide users with the ability to gain insight on system jobs that run on the system and could provide them a way to gain unauthorized privileged access."
+    remediation: "- IF - cron is installed on the system: Run the following commands to set ownership and permissions on /etc/crontab: # chown root:root /etc/crontab # chmod og-rwx /etc/crontab."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.2"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002", "TA0007"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/crontab -> r:^600 0 root 0 root$'
+
+ # 2.4.1.3 Ensure permissions on /etc/cron.hourly are configured. (Automated)
+  - id: 2413
+    title: "Ensure permissions on /etc/cron.hourly are configured."
+    description: "This directory contains system cron jobs that need to run on an hourly basis. The files in this directory cannot be manipulated by the crontab command, but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
+    rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
+    remediation: "- IF - cron is installed on the system: Run the following commands to set ownership and permissions on the /etc/cron.hourly directory: # chown root:root /etc/cron.hourly/ # chmod og-rwx /etc/cron.hourly/."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.3"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002", "TA0007"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.hourly -> r:^700 0 root 0 root$'
+
+ # 2.4.1.4 Ensure permissions on /etc/cron.daily are configured. (Automated)
+  - id: 2414
+    title: "Ensure permissions on /etc/cron.daily are configured."
+    description: "The /etc/cron.daily directory contains system cron jobs that need to run on a daily basis. The files in this directory cannot be manipulated by the crontab command, but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
+    rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
+    remediation: "- IF - cron is installed on the system: Run the following commands to set ownership and permissions on the /etc/cron.daily directory: # chown root:root /etc/cron.daily/ # chmod og-rwx /etc/cron.daily/."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.4"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002", "TA0007"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.daily -> r:^700 0 root 0 root$'
+
+# 2.4.1.5 Ensure permissions on /etc/cron.weekly are configured. (Automated)
+  - id: 2415
+    title: "Ensure permissions on /etc/cron.weekly are configured."
+    description: "The /etc/cron.weekly directory contains system cron jobs that need to run on a weekly basis. The files in this directory cannot be manipulated by the crontab command but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
+    rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
+    remediation: "- IF - cron is installed on the system: Run the following commands to set ownership and permissions on the /etc/cron.weekly directory: # chown root:root /etc/cron.weekly/ # chmod og-rwx /etc/cron.weekly/."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.5"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002", "TA0007"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.weekly -> r:^700 0 root 0 root$'
+
+# 2.4.1.6 Ensure permissions on /etc/cron.monthly are configured. (Automated)
+  - id: 2416
+    title: "Ensure permissions on /etc/cron.monthly are configured."
+    description: "The /etc/cron.monthly directory contains system cron jobs that need to run on a monthly basis. The files in this directory cannot be manipulated by the crontab command but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
+    rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
+    remediation: "- IF - cron is installed on the system: Run the following commands to set ownership and permissions on the /etc/cron.monthly directory: # chown root:root /etc/cron.monthly/ # chmod og-rwx /etc/cron.monthly/."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.6"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002", "TA0007"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.monthly -> r:^700 0 root 0 root$'
+
+# 2.4.1.7 Ensure permissions on /etc/cron.d are configured. (Automated)
+  - id: 2417
+    title: "Ensure permissions on /etc/cron.d are configured."
+    description: "The /etc/cron.d directory contains system cron jobs that need to run in a similar manner to the hourly, daily weekly and monthly jobs from /etc/crontab, but require more granular control as to when they run. The files in this directory cannot be manipulated by the crontab command but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
+    rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
+    remediation: "- IF - cron is installed on the system: Run the following commands to set ownership and permissions on the /etc/cron.d directory: # chown root:root /etc/cron.d/ # chmod og-rwx /etc/cron.d/."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.7"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - cmmc_v2.0: ["AC.L1-3.1.1", "AC.L1-3.1.2", "AC.L2-3.1.3", "AC.L2-3.1.5", "MP.L2-3.8.2"]
+      - hipaa: ["164.308(a)(3)(i)", "164.308(a)(3)(ii)(A)", "164.312(a)(1)"]
+      - iso_27001-2013: ["A.9.1.1"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002", "TA0007"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+      - nist_sp_800-53: ["AC-5", "AC-6"]
+      - pci_dss_v3.2.1: ["7.1", "7.1.1", "7.1.2", "7.1.3"]
+      - pci_dss_v4.0: ["1.3.1", "7.1"]
+      - soc_2: ["CC5.2", "CC6.1"]
+    condition: all
+    rules:
+      - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.d -> r:^700 0 root 0 root$'
+
+# 2.4.1.8 Ensure crontab is restricted to authorized users. (Automated)
+  - id: 2418
+    title: "Ensure crontab is restrited to authorized users."
+    description: "Crontab is the program used to isntall, deinstall or list the tables used to drive the cron daemon. Each user can have their own crontab, and though these are files in /var/spool/cron/crontabs, they are not intended to be edited directly. If the /etc/cron.allow file exists, then you must be listed therin in order to be allowed to use this commande. If there is no /etc/cron.allow file, but the /etc/cron.deny file exist, then you must not be listed in the /etc/cron.deny file in order to use this command. If both file exist the /etc/cron.allow takes precedence. The file /etc/cron.allow and /etc/cron.deny, if they exist, must be either world-readable, or readable by group crontab. If they are not, then cron will deny access to all users until the permissions are fixed."
+    rationale: "On many systems, only the system administrator is authorized to schedule cron jobs. Using the cron.allow file to control who can run cron jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to deny files."
+    remediation: "IF cron is installed on the system : Create /etc/cron.allow if it doesn't exist, change owner to user root, change group owner to group root OR group crontab if it exists and change mode to 640 or more restrictive. IF /etc/cron.deny exists, change owner to user root, change owner to group root OR group crontab if it exists and change mode to 640 or more restrictive."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.1.8"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - nist_sp_800-53: ["AC-3", "MP-2"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+    condition: all
+    rules:
+      - 'f:/etc/cron.allow'
+      - 'c:stat -Lc "%a %U %G" /etc/cron.allow -> r:^640 root root$ || ^640 root crontab$ || ^600 root root$ || ^600 root crontab$ || ^400 root root$ || ^400 root crontab$'
+      - 'not f:/etc/cron.deny'
+
+# 2.4.2 - Configure at
+#
+#
+
+# 2.4.2.1 Ensure at is restricted to authorized users. (Automated)
+  - id: 2421
+    title: "Ensure at is restricted to authorized users."
+    description: "at allow fairly complex time specifications, extending the POSIX.2 standard. It accepts times of the form HH:MM to run a job at a specific time of the day. You can also say what day the job will be run, by giving a date in the form month-name day with optional year, or giving a date of the form MMDD[CC]YY, MM/DD/[CC]YY, DD.MM.[CC]YY or [CC]YY-MM-DD. The /etc/at.allow and /etc/at.deny files determine which user can submit commands for later execution via at or batch. The format of the files is a list of usernames, one on each line. If /etc/at.allow does not exist, /etc/ad.deny is checked, every username not mentionned in it is then allowe to use at. An empty /etc/at.deny means that every user may use at. If neither file exists, only the superuser is allowed to use at."
+    rationale: "On many systems, only the system administrator is authorized to schedule at jobs. Using the at.allow file to control who can run cron jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to deny files."
+    remediation: "IF at is installed on the system: - /etc/at.allow: Create the file if it doesn't exist, change owner or user root, if group daemon exists, change to group daemon, else change group to root, change mode to 640 or more restrictive. IF /etc/at.deny exists: Change owner or user root, if group daemon exists, change to group daemon, else change group to root, change mode to 640 or more restrictive."
+    level: "Level 1"
+    compliance:
+      - cis: ["2.4.2.1"]
+      - cis_csc_v8: ["3.3"]
+      - cis_csc_v7: ["14.6"]
+      - nist_sp_800-53: ["AC-3", "MP-2"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1053", "T1053.003"]
+    condition: all
+    rules:
+      - 'f:/etc/at.allow'
+      - 'not f:/etc/at.deny'
+      - 'c:stat -Lc "%a %U %G" /etc/at.allow -> r:^640 root root$ || ^640 root daemon$ || ^600 root root$ || ^600 root daemon$ || ^400 root root$ || ^400 root daemon$'
+
+# 3 - Network
+# 3.1 - Configure Network Devices
+#
+#
+
+# 3.1.1 Ensure IPv6 status is identified. (Manual)
