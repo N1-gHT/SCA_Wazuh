@@ -2274,3 +2274,25 @@ checks:
       - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*pool\s+\S+'
 
 # 2.3.3.2 Ensure chrony is running as user _chrony. (Automated)
+  - id: 2332
+    title: "Ensure chrony is running as user _chrony."
+    description: "The chrony package is installed with a dedicated user account _chrony. This account is granted the access required by the chronyd service."
+    rationale: "The chronyd service should run with only the required privlidges."
+    remediation: "Add or edit the user line to /etc/chrony/chrony.conf or a file ending in .conf in /etc/chrony/conf.d/: user _chrony - OR - If another time synchronization service is in use on the system, run the following command to remove chrony from the system: # apt purge chrony # apt autoremove chrony."
+    compliance:
+      - cis: ["2.3.3.2"]
+      - cis_csc_v8: ["8.4"]
+      - cis_csc_v7: ["6.1"]
+      - cmmc_v2.0: ["AU.L2-3.3.7"]
+      - iso_27001-2013: ["A.12.4.4"]
+      - mitre_mitigations: ["M1022"]
+      - mitre_tactics: ["TA0002"]
+      - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
+      - nist_sp_800-53: ["AU-7"]
+      - pci_dss_v3.2.1: ["10.4"]
+      - pci_dss_v4.0: ["10.6", "10.6.1", "10.6.2", "10.6.3"]
+      - soc_2: ["CC4.1", "CC5.2"]
+    condition: all
+    rules:
+      - 'f:/etc/chrony/chrony.conf -> r:user\s*\t*_chrony'
+      - 'd:/etc/chrony/conf.d/ -> r:.+\.conf$ -> r:user\s*\t*_chrony'
