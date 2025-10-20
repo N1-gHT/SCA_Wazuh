@@ -1118,7 +1118,7 @@ checks:
     title: "Ensure access to bootloader config is configured."
     description: "Address space layout randomization (ASLR) is an exploit mitigation technique which randomly arranges the address space of key data areas of a process."
     rationale: "Randomly placing virtual memory regions will make it difficult to write memory page exploits as the memory placement will be consistenly shiftings."
-    remediation: "Set the parameter # kernel.randomuze_va_space = 2 in /etc/sysctl.conf or in a fil in /etc/sysctl.d/ ending in .conf."
+    remediation: "Set the parameter # kernel.randomuze_va_space = 2 in /etc/sysctl.conf or in a file in /etc/sysctl.d/ ending in .conf like va_space.conf."
     level: "Level 1"
     compliance:
       - cis: ["1.5.1"]
@@ -1131,15 +1131,17 @@ checks:
     condition: all
     rules:
       - 'c:sysctl kernel.randomize_va_space -> r:^kernel\.randomize_va_space\s*=\s*2$'
-      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
-      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
+      - 'f:/etc/sysctl.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
+      - 'f:/etc/sysctl.d/va_space.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
+      - 'f:/etc/sysctl.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
+      - 'f:/etc/sysctl.d/va_space.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
 
 # 1.5.2 Ensure ptrace_scope is restricted. (Automated)
   - id: 152
     title: "Ensure ptrace_scope is restricted"
     description: "The ptrace() system call provides a means by which one process may observe and control the execution of another process, and examine and change the tracee's memory registers."
     rationale: "If one application is compromised, it would be possible for an attacker to attach to other running processes to extract additional credentials and continue to expand the scope of their attack."
-    remediation: "Set the parameter # kernel.yama.ptrace_scope parameter in /etc/sysctl.conf or in a file in /etc/sysctl.d/ ending in .conf to a value of 1,2 or 3."
+    remediation: "Set the parameter # kernel.yama.ptrace_scope parameter in /etc/sysctl.conf or in a file in /etc/sysctl.d/ ending in .conf (like ptrace.conf) to a value of 1,2 or 3."
     level: "Level 1"
     compliance:
       - cis: ["1.5.2"]
@@ -1152,15 +1154,17 @@ checks:
     condition: all
     rules:
       - 'c:sysctl kernel.yama.ptrace_scope -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
-      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
-      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
+      - 'f:/etc/sysctl.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
+      - 'f:/etc/sysctl.d/ptrace.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
+      - 'f:/etc/sysctl.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
+      - 'f:/etc/sysctl.d/ptrace.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
 
 # 1.5.3 Ensure core dumps are restricted. (Automated)
   - id: 153
     title: "Ensure core dumps are restricted"
     description: "A core dump is the memory of an executable program. It is used to determine why a program aborted. It can also be used to glean confidential information from a core file."
     rationale: "Setting a hard limit on a core dumps prevents users from overrinding the soft variable. If a core dumps are required, consider sttings limits for user groups."
-    remediation: "Add the following line to /etc/security/limits.conf or a /etc/security/limits.d/* file # * hard core 0. Set the following parameter in /Etc/sysctl.conf or a file in /etc/sysctl.d ending in .conf # fs.suid_dumpable = 0. If systemd-coredump is installed, edit /etc/systemd/coredump.conf and add/modify the following lines # Storage=none ProcessSizeMax=0. Then run # systemctl daemon-reload."
+    remediation: "Add the following line to /etc/security/limits.conf or a /etc/security/limits.d/ file (like hardcore.conf) # * hard core 0. Set the following parameter in /etc/sysctl.conf or a file in /etc/sysctl.d ending in .conf (like suiddump.conf) # fs.suid_dumpable = 0. If systemd-coredump is installed, edit /etc/systemd/coredump.conf and add/modify the following lines # Storage=none ProcessSizeMax=0. Then run # systemctl daemon-reload."
     level: "Level 1"
     compliance:
       - cis: ["1.5.3"]
@@ -1172,8 +1176,10 @@ checks:
     rules:
       - 'c:sysctl fs.suid_dumpable -> r:^\s*fs\.suid_dumpable\s*=\s*0$'
       - 'f:/etc/security/limits.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
-      - 'f:/etc/security/limits.d/*.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
-      - 'f:/etc/sysctl.conf,/etc/sysctl.d/*.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
+      - 'f:/etc/security/limits.d/hardcore.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
+      - 'f:/etc/sysctl.conf.d/suiddump.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
+
 
 # 1.5.3 Ensure core dumps are restricted. (Automated)
   - id: 154
@@ -2247,7 +2253,7 @@ checks:
     title: "Ensure chrony is configured with authorized timeserver"
     description: "server - The server directive specifies an NTP server which can be used as a time source. The client-server relationship is strictly hierarchicaled. This directive can be used multiple time to specify multiple servers. The directive is immediately followed by either the name of the server or its IP address. pool - The syntax of this directive is similar to that for the server directive, except that is used to specify a pool of NTP servers rather than a single NTP server. The pool name is expected to resolve to multiple addresses which might change over time. This directive can be used multiple time to specify multiple servers. All options valide in the server directive can be used in this directive too."
     rationale: "Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
-    remediation: "Edit /etc/chrony/chrony.conf or a file ending in .sources in /etc/chrony/sources.d and add or edit server or pool lines as appropriate according to local site policy. Edit the chrony configuration and add or edit the server and/or pool lines returned by the aduti procedure as appropriate according to local site policy."
+    remediation: "Edit /etc/chrony/chrony.conf or create and edit timeserver.sources in /etc/chrony/sources.d and add or edit server or pool lines as appropriate according to local site policy. Edit the chrony configuration and add or edit the server and/or pool lines returned by the aduti procedure as appropriate according to local site policy."
     references:
       - "chrony.conf(5) Manual Page"
       - "https://tf.nist.gov/tf-cgi/servers.cgi"
@@ -2262,5 +2268,7 @@ checks:
       - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
     condition: all
     rules:
-      - 'f:/etc/chrony/chrony.conf,/etc/chrony/sources.d/\S+.sources -> r:^[^#;]\s*server\s+\S+'
-      - 'f:/etc/chrony/chrony.conf,/etc/chrony/sources.d/\S+.sources -> r:^[^#;]\s*pool\s+\S+'
+      - 'f:/etc/chrony/chrony.conf -> r:^[^#;]\s*server\s+\S+'
+      - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*server\s+\S+'
+      - 'f:/etc/chrony/chrony.conf -> r:^[^#;]\s*pool\s+\S+'
+      - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*pool\s+\S+'
