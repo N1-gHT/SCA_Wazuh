@@ -2272,3 +2272,5 @@ checks:
       - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*server\s+\S+'
       - 'f:/etc/chrony/chrony.conf -> r:^[^#;]\s*pool\s+\S+'
       - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*pool\s+\S+'
+
+# 2.3.3.2 Ensure chrony is running as user _chrony. (Automated)
