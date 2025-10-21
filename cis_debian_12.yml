@@ -1131,10 +1131,8 @@ checks:
     condition: all
     rules:
       - 'c:sysctl kernel.randomize_va_space -> r:^kernel\.randomize_va_space\s*=\s*2$'
-      - 'f:/etc/sysctl.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
-      - 'f:/etc/sysctl.d/va_space.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
-      - 'f:/etc/sysctl.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
-      - 'f:/etc/sysctl.d/va_space.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/va_space.conf -> r:^\s*kernel\.randomize_va_space\s*=\s*2'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/va_space.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
 
 # 1.5.2 Ensure ptrace_scope is restricted. (Automated)
   - id: 152
@@ -1154,10 +1152,8 @@ checks:
     condition: all
     rules:
       - 'c:sysctl kernel.yama.ptrace_scope -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
-      - 'f:/etc/sysctl.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
-      - 'f:/etc/sysctl.d/ptrace.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
-      - 'f:/etc/sysctl.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
-      - 'f:/etc/sysctl.d/ptrace.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/ptrace.conf -> r:^kernel\.yama\.ptrace_scope\s*=s\*[13]'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/ptrace.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
 
 # 1.5.3 Ensure core dumps are restricted. (Automated)
   - id: 153
@@ -1175,10 +1171,8 @@ checks:
     condition: all
     rules:
       - 'c:sysctl fs.suid_dumpable -> r:^\s*fs\.suid_dumpable\s*=\s*0$'
-      - 'f:/etc/security/limits.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
-      - 'f:/etc/security/limits.d/hardcore.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
-      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
-      - 'f:/etc/sysctl.conf.d/suiddump.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
+      - 'f:/etc/security/limits.conf,/etc/security/limits.d/hardcore.conf -> r:^[^#;]\s*\*\s+hard\s*core\s*0\b'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.conf.d/suiddump.conf -> r:^[^#;]\s*fs\.suid_dumpable\s*=\s*0'
 
 
 # 1.5.3 Ensure core dumps are restricted. (Automated)
@@ -2268,10 +2262,8 @@ checks:
       - mitre_techniques: ["T1070", "T1070.002", "T1562", "T1562.001"]
     condition: all
     rules:
-      - 'f:/etc/chrony/chrony.conf -> r:^[^#;]\s*server\s+\S+'
-      - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*server\s+\S+'
-      - 'f:/etc/chrony/chrony.conf -> r:^[^#;]\s*pool\s+\S+'
-      - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*pool\s+\S+'
+      - 'f:/etc/chrony/chrony.conf,/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*server\s+\S+'
+      - 'f:/etc/chrony/chrony.conf,/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*pool\s+\S+'
 
 # 2.3.3.2 Ensure chrony is running as user _chrony. (Automated)
   - id: 2332
@@ -2707,3 +2699,26 @@ checks:
 # 3.3 - Configure Network Kernel Parameters
 #
 #
+
+# 3.3.1 Ensure ip forwarding is disabled. (Automated)
+  - id: 331
+    title: "Ensure ip forwarding is disabled."
+    description: "The net.ipv4.ip_forward and net.ipv6.conf.all.forwarding flags are used to tell the system whether it can forward packets or not."
+    rationale: Setting net.ipv4.ip_forward and net.ipv6.conf.all.forwarding to 0 ensures that a system with multiple interfaces (for example, a hard proxy), will never be able to forward packets, and therefore, never serve as a router.
+    impact: "IP forwarding is required on systems configured to act as a router. If these parameters are disabled, the system will not be able to perform as a router. Many CSP hosted systems require IP forwarding to be enabled. If the system is running on a CSP platform, this requirement should be reviewed before disabling IP forwarding."
+    remediation: "Set the following parameter in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like ip_forwarding.conf): # net.ipv4.ip_forward = 0, # net.ipv6.conf.all.forwarding = 0."
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.1"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1030", "M1042"]
+      - mitre_tactics: ["TA006", "TA0009"]
+      - mitre_techniques: ["T1557", "T1557.000"]
+    condition: all
+    rules:
+      - 'c:sysctl net.ipv4.ip_forward -> r:^net\.ipv4\.ip_forward\s*=\s*0$'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/ip_forwarding.conf -> r:^[^#;]\s*net\.ipv4\.ip_forward\s*=\s*0$'
+      - 'f:/etc/sysctl.conf,/etc/sysctl.d/ip_forwarding.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.forwarding\s*=\s*0$'
+
