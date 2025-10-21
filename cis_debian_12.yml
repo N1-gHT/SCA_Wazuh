@@ -977,8 +977,8 @@ checks:
       - soc_2: ["CC5.2", "CC6.1"]
     condition: all
     rules:
-      - 'c:dpkg-query -W -f="\${Status}" apparmor -> r:^\\s*install\\s+ok\\s+installed$'
-      - 'c:dpkg-query -W -f="\${Status}" apparmor-utils -> r:^\\s*install\\s+ok\\s+installed$'
+      - 'c:dpkg-query -W -f="\${Status}" apparmor -> r:^install ok installed$'
+      - 'c:dpkg-query -W -f="\${Status}" apparmor-utils -> r:^install ok installed$'
 
 # 1.3.1.2 Ensure AppArmor is enabled in the bootloader configuration. (Automated)
   - id: 1312
@@ -2546,3 +2546,164 @@ checks:
 #
 
 # 3.1.1 Ensure IPv6 status is identified. (Manual)
+# Verify that IPv6 is disabled, change the value to 0 to verify that IPv6 is enabled.
+  - id: 311
+    title: "Ensure IPv6 status is identified."
+    description: "INFO: Verify that IPv6 is disabled, change the value to 0 to verify that IPv6 is enabled. IPv6 is the most recent version of IP. It's designed to supply IP addressing and additional security to support the predicted growth of connected devices. IPv6 is based on 128-bit addressing and can support 340 undecillion unique addresses."
+    rationale: "IETF RFC 4038 recommends that applications are built with an assumption of dual stack. It is recommended that IPv6 be enabled and configured in accordance with Benchmark recommendations. IF - dual stack and IPv6 are not used in you environment, IPv6 may be disabled to reduce the attack surface of the system, and recommendations pertaining to IPv6 can be skipped."
+    impact: "IETF RFC 4038 recommends that applications are built with an assumption of dual stack. When enabled, IPv6 will require additional configuration to reduce risk to the system."
+    remediation: "Enable or disable IPv6 in accordance with system requirements and local site policy"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.1.1"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-7"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T157", "T1557.000", "T1595", "T1595.001", "T1595.002"]
+    condition: any
+    rules:
+      - 'f:/sys/module/ipv6/parameters/disable -> r:^1$'
+      - 'c:sysctl net.ipv6.conf.all.disable_ipv6 -> r:^net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1$'
+      - 'c:sysctl net.ipv6.conf.default.disable_ipv6 -> r:^net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1$'
+  
+# 3.1.2 Ensure wireless interfaces are disabled. (Automated)
+  - id: 312
+    title: "Ensure wireless interfaces are disabled."
+    description: "Wireless networking is used when wired networks are unavailable."
+    rationale: "IF wireless is not to be used, wireless devices can be disabled to reduce the potential attack surface."
+    impact: "Many if not all laptop workstations and som desktop workstations will connect via wireless requiring these interfaces be enabled."
+    remediation: "Identify the kernel module for your wireless devie with # lspci -k. Create a file in /etc/modprobe.d/ ending in .conf. Then adding this following line # install <module_name> /bin/false # blacklist <module_name>. Finally, unload the module with modprobe -r <module_name>."
+    level: "Level 1"
+    compliance:
+      - cis: ["3.1.2"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["15.4", "15.5"]
+      - nist_sp_800-53: ["CM-7"]
+      - mitre_mitigations: ["M1028"]
+      - mitre_tactics: ["TA0010"]
+      - mitre_techniques: ["T1011", "T1011.000", "T1595", "T1595.001", "T1595.002"]
+    condition:
+    rules:
+      - 'not c:lsmod | grep -E -w "(iwlwifi|ath|ath9k|ath10k|brcmfmac|rt2x00|rtlwifi)"'
+
+# 3.1.3 Ensure bluetooth services are not in use. (Automated)
+  - id: 313
+    title: "Ensure bluetooth services are not in use."
+    description: "Bluetooth is a short-range wireless technology standard that is used for exchanging data between devices over short distances. It employs UHF radio waves in the ISM bands, from 2.402 GHz to 2.48 GHz. It is mainly used as an alternative to wire connections."
+    rationale: "An attacker may be able to find a way to access or corrupt your data. One example of this type of activity is bluesnarfing, which refers to attackers using a Bluetooth connection to steal information off of your Bluetooth device. Also, viruses or other malicious code can take advantage of Bluetooth technology to infect other devices. If you are infected, your data may be corrupted, compromised, stolen, or lost."
+    impact: "Many personal electronic devices (PEDs) use Bluetooth technology. For example, you may be able to operate your computer with a wireless keyboard. Disabling Bluetooth will prevent these devices from connecting to the system. There may be packages that are dependent on the bluez package. If the bluez package is removed, these dependent packages will be removed as well. Before removing the bluez package, review any dependent packages to determine if they are required on the system. -IF- a dependent package is required: stop and mask bluetooth.service leaving the bluez package installed."
+    remediation: "Run the following commands to stop bluetooth.service, and remove the bluez package: # systemctl stop bluetooth.service # apt purge bluez - OR - - IF - the bluez package is required as a dependency: Run the following commands to stop and mask bluetooth.service: # systemctl stop bluetooth.service # systemctl mask bluetooth.service Note: A reboot may be required."
+    references:
+      - "https://www.cisa.gov/tips/st05-015"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.1.3"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - cmmc_v2.0: ["CM.L2-3.4.7", "CM.L2-3.4.8", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.3"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0010"]
+      - mitre_techniques: ["T1011", "T1011.001"]
+      - pci_dss_v3.2.1: ["1.1.6", "1.2.1", "2.2.2", "2.2.5"]
+      - pci_dss_v4.0: ["1.2.5", "2.2.4", "6.4.1"]
+      - soc_2: ["CC6.3", "CC6.6"]
+    condition: any
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}" bluez -> r:install ok installed'
+      - 'not c:systemctl is-enabled bluetooth.service -> r:^enabled$'
+      - 'not c:systemctl is-active bluetooth.service" -> r:^active$'
+
+# 3.2 - Configure Network Kernel Modules
+#
+#
+
+# 3.2.1 Ensure dccp kernel module is not available. (Automated)
+  - id: 321
+    title: "Ensure dccp kernel module is not available."
+    description: "The Datagram Congestion Control Protocol is a transport layer protocol that supports streaming media and telephony. DCCP provides a way to gain access to congestion control, without having to do it at the application layer, but does not provide in-sequence delivery."
+    rationale: "IF the protocol is not required, it is recommend that the dirvers not be installed to reduce the potential attack surface."
+    remediation: "Run the following script to unload and disable the dccp module: IF the dccp kernel module is available in ANY installed kernel: # Create a file ending in .conf with install dccp /bin/(false|true) in the /etc/modprobe.d/ directory. # Create a file ending in .conf with blacklist dccp in the /etc/modprobe.d/ directory. Run modprobe -r dccp 2>/dev/null; rmmod dccp 2>/dev/null to remove dccp from the kernel. IF the dccp kernel module is not available on the system, or pre-compiled into the kernel , no remediation is necessary."
+    level: "Level 2"
+    compliance:
+      - cis: ["3.2.1"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["SI-4", "CM-7"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1068", "T1068.000", "T1210", "T1210.000"]
+    condition: all
+    rules:
+      - 'c:modprobe -n -v dccp -> r:^\s*install\s+/bin/false | ^\s*install\s+/bin/true'
+      - 'c:modprobe --showconfig | grep blacklist -> r:^\s*blacklist\s+dccp'
+      - 'not c:lsmod -> r:^dccp\s'
+
+# 3.2.2 Ensure tipc kernel module is not available. (Automated)
+  - id: 322
+    title: "Ensure tipc kernel module is not available."
+    description: "The Transparent Inter-Process Communication protocol is designed to provide communication between cluster nodes."
+    rationale: "IF the protocol is not required, it is recommend that the dirvers not be installed to reduce the potential attack surface."
+    remediation: "Run the following script to unload and disable the tipc module: IF the tipc kernel module is available in ANY installed kernel: # Create a file ending in .conf with install tipc /bin/(false|true) in the /etc/modprobe.d/ directory. # Create a file ending in .conf with blacklist tipc in the /etc/modprobe.d/ directory. Run modprobe -r tipc 2>/dev/null; rmmod tipc 2>/dev/null to remove tipc from the kernel. IF the tipc kernel module is not available on the system, or pre-compiled into the kernel , no remediation is necessary."
+    level: "Level 2"
+    compliance:
+      - cis: ["3.2.2"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["SI-4", "CM-7"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1068", "T1068.000", "T1210", "T1210.000"]
+    condition: all
+    rules:
+      - 'c:modprobe -n -v tipc -> r:^\s*install\s+/bin/false | ^\s*install\s+/bin/true'
+      - 'c:modprobe --showconfig | grep blacklist -> r:^\s*blacklist\s+tipc'
+      - 'not c:lsmod -> r:^tipc\s'
+
+# 3.2.3 Ensure rds kernel module is not available. (Automated)
+  - id: 323
+    title: "Ensure rds kernel module is not available."
+    description: "The Reliable Datagram Sockets protocol is a transport layer protocol designed to provide low-latency, high-bandwidth communication between cluster nodes. It was developed by Oracle."
+    rationale: "IF the protocol is not being used, it is recommended that kernel module not be loaded, disabling the service to reduce the potential attack surface."
+    remediation: "Run the following script to unload and disable the rds module: IF the rds kernel module is available in ANY installed kernel: # Create a file ending in .conf with install rds /bin/(false|true) in the /etc/modprobe.d/ directory. # Create a file ending in .conf with blacklist rds in the /etc/modprobe.d/ directory. Run modprobe -r rds 2>/dev/null; rmmod rds 2>/dev/null to remove rds from the kernel. IF the rds kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary."
+    level: "Level 2"
+    compliance:
+      - cis: ["3.2.3"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["SI-4", "CM-7"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1068", "T1068.000", "T1210", "T1210.000"]
+    condition: all
+    rules:
+      - 'c:modprobe -n -v rds -> r:^\s*install\s+/bin/false | ^\s*install\s+/bin/true'
+      - 'c:modprobe --showconfig | grep blacklist -> r:^\s*blacklist\s+rds'
+      - 'not c:lsmod -> r:^rds\s'
+
+# 3.2.4 Ensure sctp kernel module is not available. (Automated)
+  - id: 324
+    title: "Ensure sctp kernel module is not available."
+    description: "The Stream Control transmission Protocol is a transport layer protocol used to support messaged oriented communication, with several streams of message in one connection. It serves a similar function as TCP and UDP, incorporating features of both. It is message-oriented like UDP, and ensures reliable in-sequence transport of messages with congestion control like TCP."
+    rationale: "IF the protocol is not being used, it is recommended that kernel module not be loaded, disabling the service to reduce the potential attack surface."
+    remediation: "Run the following script to unload and disable the sctp module: IF the sctp kernel module is available in ANY installed kernel: # Create a file ending in .conf with install sctp /bin/(false|true) in the /etc/modprobe.d/ directory. # Create a file ending in .conf with blacklist sctp in the /etc/modprobe.d/ directory. Run modprobe -r sctp 2>/dev/null; rmmod sctp 2>/dev/null to remove sctp from the kernel. IF the sctp kernel module is not available on the system, or pre-compiled into the kernel, no remediation is necessary."
+    level: "Level 2"
+    compliance:
+      - cis: ["3.2.3"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["SI-4", "CM-7"]
+      - mitre_mitigations: ["M1042"]
+      - mitre_tactics: ["TA0008"]
+      - mitre_techniques: ["T1068", "T1068.000", "T1210", "T1210.000"]
+    condition: all
+    rules:
+      - 'c:modprobe -n -v sctp -> r:^\s*install\s+/bin/false | ^\s*install\s+/bin/true'
+      - 'c:modprobe --showconfig | grep blacklist -> r:^\s*blacklist\s+sctp'
+      - 'not c:lsmod -> r:^sctp\s'
+
+# 3.3 - Configure Network Kernel Parameters
+#
+#
