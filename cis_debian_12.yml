@@ -2746,8 +2746,8 @@ checks:
       - mitre_techniques: ["T1557", "T1557.000"]
     condition: all
     rules:
-      - 'c:sysctl net.ipv4.conf.all.send_redirects -> r:^[^#;]\s*net\.ipv4\.conf\.all\.send_redirects\s*=\s*0$'
-      - 'c:sysctl net.ipv4.conf.default.send_redirects -> r:^[^#;]\s*net\.ipv4\.conf\.default\.send_redirects\s*=\s*0$'
+      - 'c:sysctl net.ipv4.conf.all.send_redirects -> r:^net\.ipv4\.conf\.all\.send_redirects\s*=\s*0$'
+      - 'c:sysctl net.ipv4.conf.default.send_redirects -> r:^net\.ipv4\.conf\.default\.send_redirects\s*=\s*0$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.send_redirects\s*=\s*0$'
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.send_redirects\s*=\s*0$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.send_redirects\s*=\s*0$'
@@ -2770,7 +2770,7 @@ checks:
       - mitre_techniques: ["T1557", "T1557.000"]
     condition: all
     rules:
-      - 'c:sysctl net.ipv4.icmp_ignore_bogus_error_responses -> r:^[^#;]\s*net\.ipv4\.icmp_ignore_bogus_error_responses\s*=\s*1$'
+      - 'c:sysctl net.ipv4.icmp_ignore_bogus_error_responses -> r:^net\.ipv4\.icmp_ignore_bogus_error_responses\s*=\s*1$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.icmp_ignore_bogus_error_responses\s*=\s*1$'
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.icmp_ignore_bogus_error_responses\s*=\s*1$'
 
@@ -2791,9 +2791,9 @@ checks:
       - mitre_techniques: ["T1497", "T1498.001"]
     condition: all
     rules: 
-      - 'c:sysctl net.ipv4.icmp_echo_ignore_broadcasts -> r:^[^#;]\s*net\.ipv4\.icmp_echo_ignore_broadcasts\s*=\s*1$'
+      - 'c:sysctl net.ipv4.icmp_echo_ignore_broadcasts -> r:^net\.ipv4\.icmp_echo_ignore_broadcasts\s*=\s*1$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.icmp_echo_ignore_broadcasts\s*=\s*1$'
-      - 'f:/etc/sysclt.d/network.conf -> r:^[^#;]\s*net\.ipv4\.icmp_echo_ignore_broadcasts\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.icmp_echo_ignore_broadcasts\s*=\s*1$'
 
 # 3.3.5 Ensure icmp redirects are not accepted. (Automated)
   - id: 335
@@ -2812,4 +2812,55 @@ checks:
       - mitre_techniques: ["T1557", "T1557.000"]
     condition: all
     rules:
-      - 
+      - 'c:sysctl net.ipv4.conf.all.accept_redirects -> r:^net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0$'
+      - 'c:sysctl net.ipv4.conf.default.accept_redirects -> r:^net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv6\.conf\.default\.accept_redirects\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv6\.conf\.default\.accept_redirects\s*=\s*0$'
+
+# 3.3.6 Ensure secure icmp redirects are not accepted. (Automated)
+  - id: 336
+    title: "Ensure secure icmp redirects are not accepted."
+    description: "Secure ICMP redirects are the same as ICMP redirects, except they come from gateways listed on the default gateway list. It is assumed that these gateways are known to your system, and that they are likely to be secure."
+    rationale: "It is still possible for even known gateways to be compromised. Setting net.ipv4.conf.all.secure_redirects and net.ipv4.conf.default.secure_redirects to 0 protects the system from routing table updates by possibly compromised known gateways"
+    remediation: "Set the following parameters in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv4.conf.all.secure_redirects = 0 # net.ipv4.conf.default.secure_redirects = 0"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.6"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1030", "M1042"]
+      - mitre_tactics: ["TA0006", "TA0009"]
+      - mitre_techniques: ["T1557", "T1557.000"]
+    condition: all
+    rules:
+      - 'c:sysctl net.ipv4.conf.all.secure_redirects -> r:^net\.ipv4\.conf\.all\.secure_redirects\s*=\s*1$'
+      - 'c:sysctl net.ipv4.conf.default.secure_redirects -> r:^net\.ipv4\.conf\.default\.secure_redirects\s*=\s*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.secure_redirects\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.secure_redirects\s*=\s*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.secure_redirects\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.secure_redirects\s*=\s*1$'
+
+# 3.3.7 Ensure reverse path filtering is enabled. (Automated)
+  - id: 337
+    title: "Enure reverse path filtering is enabled."
+    description: "Setting net.ipv4.conf.all.rp_filter and net.ipv4.conf.default.rp_filter to 1 forces the Linux kernel to utilize reverse path filtering on a received packet to determine if the packet was valid. Essentially, with reverse path filtering, if the return packet does not go out the same interface that the corresponding source packet came from, the packet is dropped (and logged if log_martians is set)."
+    rationale:
+    remediation: "Set the following parameters in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv4.conf.all.rp_filter = 1 # net.ipv4.conf.default.rp_filter = 1"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.6"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1030", "M1042"]
+      - mitre_tactics: ["TA0006", "TA0009"]
+      - mitre_techniques: ["T1557", "T1557.000"]
+    condition: all
+    rules:
