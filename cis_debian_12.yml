@@ -8,6 +8,7 @@
 #
 # Based on : 
 # Center for Internet Security Debian Linux 12 Benchmark v1.1.0 - 26-09-2024
+# I try a rework of the ID to make is more simple and legible
 
 policy:
   id: "cis_debian_12"
@@ -36,7 +37,7 @@ checks:
 #
 #
 # 1.1.1.1 Ensure cramfs kernel module is not available. (Automated)
-  - id: 1111
+  - id: 1
     title: "Ensure cramfs kernel module is not available."
     description: "The cramfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A cramfs image can be used without having to first decompress the image."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -54,7 +55,7 @@ checks:
       - 'not c:lsmod -> r:^cramfs\s'
 
 # 1.1.1.2 Ensure freevxfs kernel module is not available. (Automated)
-  - id: 1112
+  - id: 2
     title: "Ensure freevxfs kernel module is not available."
     description: "The freevxfs filesystem type is a free version of the Veritas type filesystem. This is the primary filesystem type for HP-UX operating systems."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -72,7 +73,7 @@ checks:
       - 'not c:lsmod -> r:^freevxfs\s'
 
 # 1.1.1.3 Ensure hfs kernel module is not available. (Automated)
-  - id: 1113
+  - id: 3
     title: 'Ensure hfs kernel module is not available.'
     description: "The hfs filesystem type is a hierarchical filesystem that allows you to mount Mac OS filesystems."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -90,7 +91,7 @@ checks:
       - 'not c:lsmod -> r:^hfs\s'
 
 # 1.1.1.4 Ensure hfsplus  kernel module is not available. (Automated)
-  - id: 1114
+  - id: 4
     title: "Ensure hfs kernel module is not available."
     description: "The hfsplus filesystem type is a hierarchical filesystem that allows you to mount Mac OS filesystems."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -108,7 +109,7 @@ checks:
       - 'not c:lsmod -> r:^hfsplus\s'
 
 # 1.1.1.5 Ensure jffs2 kernel module is not available. (Automated)
-  - id: 1115
+  - id: 5
     title: "Ensure hfs kernel module is not available."
     description: "The jffs2 (journaling flash filesystem 2) filesystem type is a log-structured filesystem used in flash memory devices."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -126,7 +127,7 @@ checks:
       - 'not c:lsmod -> r:^jffs2\s'
 
 # 1.1.1.6 Ensure overlayfs kernel module is not available. (Automated)
-  - id: 1116
+  - id: 6
     title: "Ensure overlayfs kernel module is not available."
     description: "The overlayfs is a Linux filesystem that layers multiple filesystems to create a single unified view which allows a user to merge several mount points into a unified filesystem."
     rationale: "The overlayfs has known CVEs: CVE-2023-32629, CVE-2023-2640, CVE-2023-0386. Disabling the overlayfs reduces the local attack surface by removing support for unnecessary filesystem types and mitigates potential risks associated with unauthorized execution of setuid files, enhancing the overall system security."
@@ -144,7 +145,7 @@ checks:
       - 'not c:lsmod -> r:^overlayfs\s'
 
 # 1.1.1.7 Ensure squashfs kernel module is not available. (Automated)
-  - id: 1117
+  - id: 7
     title: "Ensure squashfs kernel module is not available."
     description: "The squashfs filesystem type is a compressed read-only Linux filesystem embedded in small footprint systems. A squashfs image can be used without having to first decompress the image."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -162,7 +163,7 @@ checks:
       - 'not c:lsmod -> r:^squashfs\s'
 
 # 1.1.1.8 Ensure udf kernel module is not available. (Automated)
-  - id: 1118
+  - id: 8
     title: "Ensure udf kernel module is not available."
     description: "The udf filesystem type is the universal disk format used to implement ISO/IEC 13346 and ECMA-167 specifications. This is an open vendor filesystem type for data storage on a broad range of media. This filesystem type is necessary to support writing DVDs and newer optical disc formats."
     rationale: "Removing support for unneeded filesystem types reduces the local attack surface of the system. If this filesystem type is not needed, disable it."
@@ -180,7 +181,7 @@ checks:
       - 'not c:lsmod -> r:^udf\s'
 
 # 1.1.1.9 Ensure usb-storage kernel module is not available. (Automated)
-  - id: 1119
+  - id: 9
     title: "Ensure usb-storage kernel module is not available."
     description: "USB storage provides a means to transfer and store files ensuring persistence and availability of the files independent of network connection status. Its popularity and utility has led to USB-based malware being a simple and common means for network infiltration and a first step to establishing a persistent threat within a networked environment."
     rationale: "Restricting USB access on the system will decrease the physical attack surface for a device and diminish the possible vectors to introduce malware."
@@ -206,7 +207,7 @@ checks:
 #
 
 # 1.1.2.1.1 Ensure /tmp is a separate partition. (Automated)
-  - id: 11211
+  - id: 10
     title: "Ensure /tmp is a separate partition."
     description: "The /tmp directory is a world-writable directory used for temporary storage by all users and some applications. - IF - an entry for /tmp exists in /etc/fstab it will take precedence over entries in systemd default unit file. Note: In an environment where the main system is diskless and connected to iSCSI, entries in /etc/fstab may not take precedence. /tmp can be configured to use tmpfs. tmpfs puts everything into the kernel internal caches and grows and shrinks to accommodate the files it contains and is able to swap unneeded pages out to swap space. It has maximum size limits which can be adjusted on the fly via mount -o remount. Since tmpfs lives completely in the page cache and on swap, all tmpfs pages will be shown as Shmem in /proc/meminfo and Shared in free. Notice that these counters also include shared memory. The most reliable way to get the count is using df and du. tmpfs has three mount options for sizing: - size: The limit of allocated bytes for this tmpfs instance. The default is half of your physical RAM without swap. If you oversize your tmpfs instances the machine will deadlock since the OOM handler will not be able to free that memory. - nr_blocks: The same as size, but in blocks of PAGE_SIZE. - nr_inodes: The maximum number of inodes for this instance. The default is half of the number of your physical RAM pages, or (on a machine with highmem) the number of lowmem RAM pages, whichever is the lower. These parameters accept a suffix k, m or g and can be changed on remount. The size parameter also accepts a suffix % to limit this tmpfs instance to that percentage of your physical RAM. The default, when neither size nor nr_blocks is specified, is size=50%."
     rationale: "Making /tmp its own file system allows an administrator to set additional mount options such as the noexec option on the mount, making /tmp useless for an attacker to install executable code. It would also prevent an attacker from establishing a hard link to a system setuid program and wait for it to be updated. Once the program was updated, the hard link would be broken, and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw. This can be accomplished by either mounting tmpfs to /tmp, or creating a separate partition for /tmp."
@@ -235,7 +236,7 @@ checks:
       - 'c:systemctl is-enabled tmp.mount -> !r:masked|disabled && r:generated|enabled'
 
 # 1.1.2.1.2 Ensure nodev option set on /tmp partition. (Automated)
-  - id: 11212
+  - id: 11
     title: "Ensure nodev option set on /tmp partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /tmp filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /tmp."
@@ -258,7 +259,7 @@ checks:
       - 'c:findmnt -kn /tmp -> r:nodev'
 
 # 1.1.2.1.3 Ensure nosuid option set on /tmp partition. (Automated)
-  - id: 11213
+  - id: 12
     title: "Ensure nosuid option set on /tmp partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /tmp."
@@ -283,7 +284,7 @@ checks:
       - 'c:findmnt -kn /tmp -> r:nosuid'
 
 # 1.1.2.1.4 Ensure noexec option set on /tmp partition. (Automated)
-  - id: 11214
+  - id: 13
     title: "Ensure noexec option set on /tmp partition."
     description: "The noexec mount option specifies that the filesystem cannot contain executable binaries."
     rationale: "Since the /tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot run executable binaries from /tmp."
@@ -313,7 +314,7 @@ checks:
 #
 
 # 1.1.2.2.1 Ensure /dev/shm is a separate partition. (Automated)
-  - id: 11221
+  - id: 14
     title: "Ensure /dev/shm is a separate partition."
     description: "The /dev/shm directory is a world-writable directory that can function as shared memory that facilitates inter process communication (IPC)."
     rationale: "Making /dev/shm its own file system allows an administrator to set additional mount options such as the noexec option on the mount, making /dev/shm useless for an attacker to install executable code. It would also prevent an attacker from establishing a hard link to a system setuid program and wait for it to be updated. Once the program was updated, the hard link would be broken and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw. This can be accomplished by mounting tmpfs to /dev/shm."
@@ -340,7 +341,7 @@ checks:
       - 'c:findmnt -kn /dev/shm -> r:^\s*/dev/shm\s'
 
 # 1.1.2.2.2 Ensure nodev option set on /dev/shm partition. (Automated)
-  - id: 11222
+  - id: 15
     title: "Ensure nodev option set on /dev/shm partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /dev/shm filesystem is not intended to support devices, set this option to ensure that users cannot attempt to create special devices in /dev/shm partitions."
@@ -365,7 +366,7 @@ checks:
       - 'c:findmnt -kn /dev/shm -> r:nodev'
 
 # 1.1.2.2.3 Ensure nosuid option set on /dev/shm partition. (Automated)
-  - id: 11223
+  - id: 16
     title: "Ensure nosuid option set on /dev/shm partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Setting this option on a file system prevents users from introducing privileged programs onto the system and allowing non-root users to execute them."
@@ -390,7 +391,7 @@ checks:
       - 'c:findmnt -kn /dev/shm -> r:nosuid'
 
 # 1.1.2.2.4 Ensure noexec option set on /dev/shm partition. (Automated)
-  - id: 11224
+  - id: 17
     title: "Ensure noexec option set on /dev/shm partition."
     description: "The noexec mount option specifies that the filesystem cannot contain executable binaries."
     rationale: "Setting this option on a file system prevents users from executing programs from shared memory. This deters users from introducing potentially malicious software on the system."
@@ -419,7 +420,7 @@ checks:
 #
 
 # 1.1.2.3.1 Ensure separate partition exists for /home. (Automated)
-  - id: 11231
+  - id: 18
     title: "Ensure separate partition exists for /home."
     description: "The /home directory is used to support disk storage needs of local users."
     rationale: "The default installation only creates a single / partition. Since the /home directory contains user generated data, there is a risk of resource exhaustion. It will essentially have the whole disk available to fill up and impact the system as a whole. In addition, other operations on the system could fill up the disk unrelated to /home and impact all local users. Configuring /home as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attacker's ability to create exploits on the system. In the case of /home options such as usrquota/grpquota may be considered to limit the impact that users can have on each other with regards to disk resource exhaustion. Other options allow for specific behavior. See man mount for exact details regarding filesystem-independent and filesystem-specific options. As /home contains user data, care should be taken to ensure the security and integrity of the data and mount point."
@@ -447,7 +448,7 @@ checks:
       - 'c:findmnt -kn /home -> r:^\s*/home\s'
 
 # 1.1.2.3.2 Ensure nodev option set on /home partition. (Automated)
-  - id: 11232
+  - id: 19
     title: "Ensure nodev option set on /home partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /home filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /home."
@@ -472,7 +473,7 @@ checks:
       - 'c:findmnt -kn /home -> r:nodev'
 
 # 1.1.2.3.3 Ensure nosuid option set on /home partition. (Automated)
-  - id: 11233
+  - id: 20
     title: "Ensure nosuid option set on /home partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /home filesystem is only intended for user file storage, set this option to ensure that users cannot create setuid files in /home."
@@ -501,7 +502,7 @@ checks:
 #
 
 # 1.1.2.4.1 Ensure separate partition exists for /var. (Automated)
-  - id: 11241
+  - id: 21
     title: "Ensure separate partition exists for /var."
     description: "The /var directory is used by daemons and other system services to temporarily store dynamic data. Some directories created by these processes may be world-writable."
     rationale: "The reasoning for mounting /var on a separate partition is as follows. The default installation only creates a single / partition. Since the /var directory may contain world writable files and directories, there is a risk of resource exhaustion. It will essentially have the whole disk available to fill up and impact the system. In addition, other operations on the system could fill up the disk unrelated to /var and cause unintended behavior across the system as the disk is full. See man auditd.conf for details. Configuring /var as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attacker's ability to create exploits on the system. Other options allow for specific behavior. See man mount for exact details regarding filesystem-independent and filesystem-specific options. An example of exploiting /var may be an attacker establishing a hard-link to a system setuid program and waiting for it to be updated. Once the program is updated, the hard-link can be broken and the attacker would have their own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw."
@@ -529,7 +530,7 @@ checks:
       - 'c:findmnt -kn /var -> r:^\s*/var\s'
 
 # 1.1.2.4.2 Ensure nodev option set on /var partition. (Automated)
-  - id: 11242
+  - id: 22
     title: "Ensure nodev option set on /var partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /var filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /var."
@@ -554,7 +555,7 @@ checks:
       - 'c:findmnt -kn /var -> r:nodev'
 
 # 1.1.2.4.3 Ensure nosuid option set on /var partition. (Automated)
-  - id: 11243
+  - id: 23
     title: "Ensure nosuid option set on /var partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /var filesystem is only intended for variable files such as logs, set this option to ensure that users cannot create setuid files in /var."
@@ -583,7 +584,7 @@ checks:
 #
 
 # 1.1.2.5.1 Ensure separate partition exists for /var/tmp. (Automated)
-  - id: 11251
+  - id: 24
     title: "Ensure separate partition exists for /var/tmp."
     description: "The /var/tmp directory is a world-writable directory used for temporary storage by all users and some applications. Temporary files residing in /var/tmp are to be preserved between reboots."
     rationale: "The default installation only creates a single / partition. Since the /var/tmp directory is world-writable, there is a risk of resource exhaustion. In addition, other operations on the system could fill up the disk unrelated to /var/tmp and cause potential disruption to daemons as the disk is full. Configuring /var/tmp as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attacker's ability to create exploits on the system."
@@ -611,7 +612,7 @@ checks:
       - 'c:findmnt -kn /var/tmp -> r:^\s*/var/tmp\s'
 
 # 1.1.2.5.2 Ensure nodev option set on /var/tmp partition. (Automated)
-  - id: 11252
+  - id: 25
     title: "Ensure nodev option set on /var/tmp partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /var/tmp filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /var/tmp."
@@ -636,7 +637,7 @@ checks:
       - 'c:findmnt -kn /var/tmp -> r:nodev'
 
 # 1.1.2.5.3 Ensure nosuid option set on /var/tmp partition. (Automated)
-  - id: 11253
+  - id: 26
     title: "Ensure nosuid option set on /var/tmp partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /var/tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot create setuid files in /var/tmp."
@@ -661,7 +662,7 @@ checks:
       - 'c:findmnt -kn /var/tmp -> r:nosuid'
 
  # 1.1.2.5.4 Ensure noexec option set on /var/tmp partition. (Automated)
-  - id: 11254
+  - id: 27
     title: "Ensure noexec option set on /var/tmp partition."
     description: "The noexec mount option specifies that the filesystem cannot contain executable binaries."
     rationale: "Since the /var/tmp filesystem is only intended for temporary file storage, set this option to ensure that users cannot run executable binaries from /var/tmp."
@@ -690,7 +691,7 @@ checks:
 #
 
 # 1.1.2.6.1 Ensure separate partition exists for /var/log. (Automated)
-  - id: 11261
+  - id: 28
     title: "Ensure separate partition exists for /var/log."
     description: "The /var/log directory is used by system services to store log data."
     rationale: "The default installation only creates a single / partition. Since the /var/log directory contains log files which can grow quite large, there is a risk of resource exhaustion. It will essentially have the whole disk available to fill up and impact the system as a whole. Configuring /var/log as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attackers ability to create exploits on the system. Other options allow for specific behavior. See man mount for exact details regarding filesystem-independent and filesystem-specific options. As /var/log contains log files, care should be taken to ensure the security and integrity of the data and mount point."
@@ -714,7 +715,7 @@ checks:
       - 'c:findmnt -kn /var/log -> r:^\s*/var/log\s'
 
 # 1.1.2.6.2 Ensure nodev option set on /var/log partition. (Automated)
-  - id: 11262
+  - id: 29
     title: "Ensure nodev option set on /var/log partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /var/log filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /var/log."
@@ -739,7 +740,7 @@ checks:
       - "c:findmnt -kn /var/log -> r:nodev"
 
 # 1.1.2.6.3 Ensure nosuid option set on /var/log partition. (Automated)
-  - id: 11263
+  - id: 30
     title: "Ensure nosuid option set on /var/log partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /var/log filesystem is only intended for log files, set this option to ensure that users cannot create setuid files in /var/log."
@@ -764,7 +765,7 @@ checks:
       - "c:findmnt -kn /var/log -> r:nosuid"
 
 # 1.1.2.6.4 Ensure noexec option set on /var/log partition. (Automated)
-  - id: 11264
+  - id: 31
     title: "Ensure noexec option set on /var/log partition."
     description: "The noexec mount option specifies that the filesystem cannot contain executable binaries."
     rationale: "Since the /var/log filesystem is only intended for log files, set this option to ensure that users cannot run executable binaries from /var/log."
@@ -793,7 +794,7 @@ checks:
 #
 
 # 1.1.2.7.1 Ensure separate partition exists for /var/log/audit. (Automated)
-  - id: 11271
+  - id: 32
     title: "Ensure separate partition exists for /var/log/audit."
     description: "The auditing daemon, auditd, stores log data in the /var/log/audit directory."
     rationale: "The default installation only creates a single / partition. Since the /var/log/audit directory contains the audit.log file which can grow quite large, there is a risk of resource exhaustion. It will essentially have the whole disk available to fill up and impact the system as a whole. In addition, other operations on the system could fill up the disk unrelated to /var/log/audit and cause auditd to trigger its space_left_action as the disk is full. See man auditd.conf for details. Configuring /var/log/audit as its own file system allows an administrator to set additional mount options such as noexec/nosuid/nodev. These options limit an attacker's ability to create exploits on the system. Other options allow for specific behavior. See man mount for exact details regarding filesystem-independent and filesystem-specific options. As /var/log/audit contains audit logs, care should be taken to ensure the security and integrity of the data and mount point."
@@ -817,7 +818,7 @@ checks:
       - 'c:findmnt -kn /var/log/audit -> r:^\s*/var/log/audit\s'
 
 # 1.1.2.7.2 Ensure nodev option set on /var/log/audit partition. (Automated)
-  - id: 11272
+  - id: 33
     title: "Ensure nodev option set on /var/log/audit partition."
     description: "The nodev mount option specifies that the filesystem cannot contain special devices."
     rationale: "Since the /var/log/audit filesystem is not intended to support devices, set this option to ensure that users cannot create a block or character special devices in /var/log/audit."
@@ -842,7 +843,7 @@ checks:
       - "c:findmnt -kn /var/log/audit -> r:nodev"
 
 # 1.1.2.7.3 Ensure nosuid option set on /var/log/audit partition. (Automated)
-  - id: 11273
+  - id: 34
     title: "Ensure nosuid option set on /var/log/audit partition."
     description: "The nosuid mount option specifies that the filesystem cannot contain setuid files."
     rationale: "Since the /var/log/audit filesystem is only intended for variable files such as logs, set this option to ensure that users cannot create setuid files in /var/log/audit."
@@ -867,7 +868,7 @@ checks:
       - "c:findmnt -kn /var/log/audit -> r:nosuid"
 
 # 1.1.2.7.4 Ensure noexec option set on /var/log/audit partition. (Automated)
-  - id: 11274
+  - id: 35
     title: "Ensure noexec option set on /var/log/audit partition."
     description: "The noexec mount option specifies that the filesystem cannot contain executable binaries."
     rationale: "Since the /var/log/audit filesystem is only intended for audit logs, set this option to ensure that users cannot run executable binaries from /var/log/audit."
@@ -898,7 +899,7 @@ checks:
 # The creation of a “to be verified” category seems necessary for rules that can only be implemented entirely manually.
 
 # 1.2.1.1 Ensure GPG Keys are configured (Manual)
-#  - id: 1211
+#  - id: 36
 #    title: "Ensure GPG Keys are configured."
 #    description: "Most package managers implement GPG Keys signing to verify package integrity during installation."
 #    rationale: "It is important to ensure that updates are obtained from a valide source to protect against spoofing that could lead to the inadvertent installation of malware on the system."
@@ -913,7 +914,7 @@ checks:
 # This rule is currently not implementable because it requires human intervention
 
 # 1.2.1.2 Ensure package manager repositories are configured (Manual)
-#  - id: 1212
+#  - id: 37
 #    title: "Ensure package manager repositories are configured."
 #    description: "Systems need to have package manager repositories configured to ensure they receive the latest patches and updates."
 #    rationale: "If a system's package repositories are misconfigured important patches may not be identified or a rogue repository could introduce compromised software."
@@ -932,7 +933,7 @@ checks:
 #
 
 # 1.2.2.1 Ensure update, patches, and additional security software are installed. (Manual)
-  - id: 1221
+  - id: 38
     title: "Ensure updates, patches, and additionnal security software are installed."
     description: "Periodically patches are released for included software either due to security flaws or to include additional functionality."
     rationale: ""
@@ -955,7 +956,7 @@ checks:
 #
 
 # 1.3.1.1 Ensure AppArmor is installed. (Automated)
-  - id: 13111
+  - id: 39
     title: "Ensure AppArmor is installed."
     description: "AppArmor provides Mandatory Access Controls."
     rationale: "Without a Mandatory Access Control system installed only the default Discretionary Access Control system will be available."
@@ -981,7 +982,7 @@ checks:
       - 'c:dpkg-query -W -f="\${Status}" apparmor-utils -> r:^install ok installed$'
 
 # 1.3.1.2 Ensure AppArmor is enabled in the bootloader configuration. (Automated)
-  - id: 1312
+  - id: 40
     title: "Ensure AppArmor is enabled in the bootloader configuration."
     description: "Configure AppArmor to be enabled at boot time and verify that it has not been overwritten by the bootloader boot parameters. Note: This recommendation is designed around the grub bootloader, if LILO or another bootloader is in use in your environment enact equivalent settings."
     rationale: "AppArmor must be enabled at boot time in your bootloader configuration to ensure that the controls it provides are not overridden."
@@ -1007,7 +1008,7 @@ checks:
       - 'f:/boot/grub/grub.cfg -> r:\s*\t*linux && !r:security=apparmor'
 
 # 1.3.1.3 Ensure AppArmor Profiles are in enforce or complain mode. (Automated)
-  - id: 1313
+  - id: 41
     title: "Ensure AppArmor Profiles are ine enforce or complain mode."
     description: "AppArmor profiles define what ressources applications are able to access."
     rationale: "Security configuration requirements vary from site to site. This item is intended to ensure that any policies that exist on the system are activated"
@@ -1030,7 +1031,7 @@ checks:
       - 'not c:apparmor_status -> r:^[1-9]\d*\s+processes\s+are\s+unconfined'
 
 # 1.3.1.4 Ensure all AppArmor Profiles are in enforce mode. (Automated)
-  - id: 1314
+  - id: 42
     title: "Ensure AppArmor Profiles are ine enforce or complain mode."
     description: "AppArmor profiles define what ressources applications are able to access."
     rationale: "Security configuration requirements vary from site to site. This item is intended to ensure that any policies that exist on the system are activated"
@@ -1058,7 +1059,7 @@ checks:
 #
 
 # 1.4.1 Ensure bootloader password is set. (Automated)
-  - id: 141
+  - id: 43
     title: "Ensure bootloader password is set."
     description: "Setting the boot loader password will require that anyone rebooting the system must enter a password before being able to set command line boot parameters."
     rationale: "Requiring a boot password upon execution of the boot loader will prevent an unauthorized user from entering boot parameters or changing the boot partition. This prevents users from weakening security (e.g. turning off AppArmor at boot time)."
@@ -1085,7 +1086,7 @@ checks:
       - 'f:/boot/grub/grub.cfg -> r:^\s*\t*password_pbkdf2\s*\t*[\w@-]+\s+grub\.pbkdf2'
 
 # 1.4.2 Ensure access to bootloader config is configured. (Automated)
-  - id: 142
+  - id: 44
     title: "Ensure access to bootloader config is configured."
     description: "The grub configuration file contains information on boot settings and passwords for unlocking boot options."
     rationale: "Setting the permissions to read and write for root only prevents non-root users from seeing the boot parameters or changing them. Non-root users who read the boot parameters may be able to identify weaknesses in security upon boot and be able to exploit them."
@@ -1114,7 +1115,7 @@ checks:
 #
 
 # 1.5.1 Ensure address layout randomization is enabled. (Automated)
-  - id: 151
+  - id: 45
     title: "Ensure access to bootloader config is configured."
     description: "Address space layout randomization (ASLR) is an exploit mitigation technique which randomly arranges the address space of key data areas of a process."
     rationale: "Randomly placing virtual memory regions will make it difficult to write memory page exploits as the memory placement will be consistenly shiftings."
@@ -1135,7 +1136,7 @@ checks:
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/va_space.conf -> !r:^\s*kernel\.randomize_va_space\s*=\s*[01]\b'
 
 # 1.5.2 Ensure ptrace_scope is restricted. (Automated)
-  - id: 152
+  - id: 46
     title: "Ensure ptrace_scope is restricted"
     description: "The ptrace() system call provides a means by which one process may observe and control the execution of another process, and examine and change the tracee's memory registers."
     rationale: "If one application is compromised, it would be possible for an attacker to attach to other running processes to extract additional credentials and continue to expand the scope of their attack."
@@ -1156,7 +1157,7 @@ checks:
       - 'f:/etc/sysctl.conf,/etc/sysctl.d/ptrace.conf -> !r:^kernel\.yama\.ptrace_scope\s*=s\*0\b'
 
 # 1.5.3 Ensure core dumps are restricted. (Automated)
-  - id: 153
+  - id: 47
     title: "Ensure core dumps are restricted"
     description: "A core dump is the memory of an executable program. It is used to determine why a program aborted. It can also be used to glean confidential information from a core file."
     rationale: "Setting a hard limit on a core dumps prevents users from overrinding the soft variable. If a core dumps are required, consider sttings limits for user groups."
@@ -1178,7 +1179,7 @@ checks:
 
 
 # 1.5.3 Ensure core dumps are restricted. (Automated)
-  - id: 154
+  - id: 48
     title: "Ensure core dumps are restricted with coredump"
     description: "A core dump is the memory of an executable program. It is used to determine why a program aborted. It can also be used to glean confidential information from a core file."
     rationale: "Setting a hard limit on a core dumps prevents users from overrinding the soft variable. If a core dumps are required, consider sttings limits for user groups."
@@ -1201,7 +1202,7 @@ checks:
 #
 
 # 1.6.1 Ensure message of the day is configured properly. (Automated)
-  - id: 161
+  - id: 49
     title: "Ensure message of the day is configured properly."
     description: "The content of the /etc/motd file are displayed to users after login and function as a message of the day for authenticated users."
     rationale: "Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organizations that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system."
@@ -1219,7 +1220,7 @@ checks:
       - 'not f:/etc/motd -> r:\\v|\\r|\\m|\s|Debian|Ubuntu'
 
 # 1.6.2 Ensure local login warning banner is configured properly. (Automated)
-  - id: 162
+  - id: 50
     title: "Ensure local warning banner is configured properly."
     description: "The contents of th /etc/issue file are displayed to users prior to login for local terminals."
     rationale: "Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organizations that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system."
@@ -1236,7 +1237,7 @@ checks:
       - 'not f:/etc/issue -> r:\\v|\\r|\\m|\s|Debian|Ubuntu'
 
 # 1.6.3 Ensure remote login warning banner is configured properly. (Automated)
-  - id: 163
+  - id: 51
     title: "Ensure remote warning banner is configured properly."
     description: "The contents of th /etc/issue.net file are displayed to users prior to login for local terminals."
     rationale: "Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organizations that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system."
@@ -1253,7 +1254,7 @@ checks:
       - 'not f:/etc/issue.net -> r:\\v|\\r|\\m|\s|Debian|Ubuntu'
 
 # 1.6.4 Ensure access to /etc/motd is configured. (Automated)
-  - id: 164
+  - id: 52
     title: "Ensure access to /etc/motd is configured."
     description: "The contents of the /etc/motd file are displayed to users after login and function as a message of the day for authenticated users."
     rationale: "- IF - the /etc/motd file does not have the correct access configured, it could be modified by unauthorized users with incorrect or misleading information."
@@ -1279,7 +1280,7 @@ checks:
       - 'c:stat -Lc " %a %u %U %g %G" /etc/motd -> r:^644 0 root 0 root$ || ^600 0 root 0 root$ || ^400 0 root 0 root$'
 
 # 1.6.5 Ensure access to /etc/issue is configured. (Automated)
-  - id: 165
+  - id: 53
     title: "Ensure access to /etc/issue is configured."
     description: "The contents of the /etc/issue file are displayed to users prior to login for local terminals."
     rationale: "- IF - the /etc/issue file does not have the correct access configured, it could be modified by unauthorized users with incorrect or misleading information."
@@ -1304,7 +1305,7 @@ checks:
       - 'c:stat -Lc " %a %u %U %g %G" /etc/issue -> r:^644 0 root 0 root$ || ^600 0 root 0 root$ || ^400 0 root 0 root$'
 
 # 1.6.6 Ensure access to /etc/issue.net is configured. (Automated)
-  - id: 166
+  - id: 54
     title: "Ensure access to /etc/issue.net is configured."
     description: "The contents of the /etc/issue.net file are displayed to users prior to login for remote connections from configured services."
     rationale: "- IF - the /etc/issue.net file does not have the correct access configured, it could be modified by unauthorized users with incorrect or misleading information."
@@ -1333,7 +1334,7 @@ checks:
 #
 
 # 1.7.1 Ensure GDM is removed. (Automated)
-  - id: 171
+  - id: 55
     title: "Ensure GDM is removed."
     description: "The GNOME Display Manager (GDM) is a program that manages graphical display servers and handles graphical user logins."
     rationale: "If a Graphical User Interface (GUI) is not required, it should be removed to reduce the attack surface of the system."
@@ -1357,7 +1358,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" gdm3 -> r:^install ok installed$'
 
 # 1.7.2 Ensure GDM login banner is configured. (Automated)
-  - id: 172
+  - id: 56
     title: "Ensure GDM login banner is configured"
     description: "GDM is the Gnome Display Manager which handles graphic login for GNOME based systems."
     rationale: "Warnin messages inform users who are attempting to login to the system of their legal status regarding th system and must include the name of the organization that owns the system and any monitoring policies that are in place."
@@ -1376,7 +1377,7 @@ checks:
       - 'not c:gsettings get org.gnome.login-screen banner-message-text -> r:^''''$'
 
 # 1.7.3 Ensure GDM disable-user-list option is enabled. (Automadted)
-  - id: 173
+  - id: 57
     title: "Ensure GDM disable-user-list is enabled"
     description: "GDM is the Gnome Display Manager which handles graphic login for GNOME based systems. The disable-user-list options control if a list of users is displayed on the login screen."
     rationale: "Displaying the user list eliminates half of the Userid/Password equation that an unauthorized person would need to log on."
@@ -1394,7 +1395,7 @@ checks:
       - 'c:gsettings get org.gnome.login-screen disable-user-list -> r:^true$'
 
 # 1.7.4 Ensure GDM screen locks when the user is idle. (Automated)
-  - id: 174
+  - id: 58
     title: "Ensure GDM screen locks when the user is idle."
     description: "GNOME Desktop Manager can make the screen lock automatically whenever the user is idle for some amount of time."
     rationale: "Settings a lock-out value reduces the window of opportunity for unauthorized user access to another user's session that has been left unattended."
@@ -1414,7 +1415,7 @@ checks:
       - 'c:gsettings get org.gnome.desktop.session idle-delay | awk ''{print $2}'' -> n:(\d+) compare <= 900'
 
 # 1.7.5 Ensure GDM screen locks cannot be overriden. (Automated)
-  - id: 175
+  - id: 59
     title: "Ensure GDM scree, locks cannot be overridden."
     description: "GNOME Desktop Manager can lock down specific settings by using the lockdown mode in dconf to prevent users from changing specific settings. To lock down a dconf key or subpath, create a locks subdirectory in the keyfile directory. The files inside this directory contain a list of keys or subpaths to lock. Just as with the keyfiles, you may add any number of files to this directory."
     rationale: "Setting a lock-out value reduces the window of opportunity for unauthorized user access to another user's session that has been left unattended. Without locking down the system settings, user settings take precedence over the system settings."
@@ -1447,7 +1448,7 @@ checks:
 #
 
 # 2.1.1 Ensure autofs service are not in use. (Automated)
-  - id: 211
+  - id: 65
     title: "Ensure autofs services are not in use."
     description: "autofs allows automatic mounting of devices, typically including CD/DVDs and USB drives."
     rationale: "With automounting enabled anyone with physical access could attach a USB drive or disc and have its contents available in the filesystem even if they lacked permissions to mount it themselves."
@@ -1473,7 +1474,7 @@ checks:
       - 'not c:systemctl is-active autofs.service -> r:^active$'
     
 # 2.1.2 Ensure avahi daemon services are not in use. (Automated)
-  - id: 212
+  - id: 66
     title: "Ensure avahi daemon services are not in use."
     description: "Avahi is a free zeroconf implementation, including a system for multicast DNS/DNS-SD service discovery. Avahi allows programs to publish and discover services and hosts running on a local network with no specific configuration. For example, a user can plug a computer into a network and Avahi automatically finds printers to print to, files to look at and people to talk to, as well as network services running on the machine."
     rationale: "Automatic discovery of network services is not normally required for system functionality. It is recommended to remove this package to reduce the potential attack surface."
@@ -1499,7 +1500,7 @@ checks:
       - 'not c:systemctl is-active avahi-daemon.socket avahi-daemon.service -> r:^active$'
 
 # 2.1.3 Ensure dhcp server services are not in use. (Automated)
-  - id: 213
+  - id: 67
     title: "Ensure dhcp server services are not in use."
     description: "The Dynamic Host Configuration Protocol (DHCP) is a service that allows machines to be dynamically assigned IP addresses. There are two versions of the DHCP protocol DHCPv4 and DHCPv6. At startup the server may be started for one or the other via the -4 or -6 arguments."
     rationale: "Unless a system is specifically set up to act as a DHCP server, it is recommended that this package be removed to reduce the potential attack surface."
@@ -1527,7 +1528,7 @@ checks:
       - 'not c:systemctl is-active isc-dhcp-server.service isc-dhcp-server6.service -> r:^active$'
 
 # 2.1.4 Ensure dns server services are not in use. (Automated)
-  - id: 214
+  - id: 68
     title: "Ensure dns server services are not in use."
     description: "The Domain Name System (DNS) is a hierarchical naming system that maps names to IP addresses for computers, services and other resources connected to a network. Note: bind9 is the package and bind.service is the alias for named.service."
     rationale: "Unless a system is specifically designated to act as a DNS server, it is recommended that the package be deleted to reduce the potential attack surface."
@@ -1554,7 +1555,7 @@ checks:
 
 
 # 2.1.5 Ensure dnsmasq services are not in use. (Automated)
-  - id: 215
+  - id: 69
     title: "Ensure dnsmasq services are not in use."
     description: "dnsmasq is a lightweight tool that provides DNS caching, DNS forwarding and DHCP (Dynamic Host Configuration Protocol) services."
     rationale: "Unless a system is specifically designated to act as a DNS caching, DNS forwarding and/or DHCP server, it is recommended that the package be removed to reduce the potential attack surface."
@@ -1580,7 +1581,7 @@ checks:
 
 
 # 2.1.6 Ensure ftp server services are not in use. (Automated)
-  - id: 216
+  - id: 70
     title: "Ensure ftp server services are not in use."
     description: "The File Transfer Protocol (FTP) provides networked computers with the ability to transfer files. vsftpd is the Very Secure File Transfer Protocol Daemon."
     rationale: "FTP does not protect the confidentiality of data or authentication credentials. It is recommended SFTP be used if file transfer is required. Unless there is a need to run the system as a FTP server (for example, to allow anonymous downloads), it is recommended that the package be deleted to reduce the potential attack surface."
@@ -1606,7 +1607,7 @@ checks:
       - 'not c:systemctl is-active vsftpd.service -> r:^active$'
 
 # 2.1.7 Ensure ldap server services are not in use. (Automated)
-  - id: 217
+  - id: 71
     title: "Ensure ldap server services are not in use."
     description: "The Lightweight Directory Access Protocol (LDAP) was introduced as a replacement for NIS/YP. It is a service that provides a method for looking up information from a central database."
     rationale: "If the system will not need to act as an LDAP server, it is recommended that the software be removed to reduce the potential attack surface."
@@ -1634,7 +1635,7 @@ checks:
       - 'not c:systemctl is-active slapd.service -> r:^active$'
 
 # 2.1.8 Ensure message access server services are not in use. (Automated)
-  - id: 218
+  - id: 72
     title: "Ensure message access server services are not in use."
     description: "dovecot-imapd and dovecot-pop3d are an open source IMAP and POP3 server for Linux based systems."
     rationale: "Unless POP3 and/or IMAP servers are to be provided by this system, it is recommended that the package be removed to reduce the potential attack surface. Note: Several IMAP/POP3 servers exist and can use other service names. These should also be audited and the packages removed if not required."
@@ -1660,7 +1661,7 @@ checks:
       - 'not c:systemctl is-active dovecot.socket dovecot.service -> r:^active$'
 
 # 2.1.9 Ensure network file system services are not in use. (Automated)
-  - id: 219
+  - id: 73
     title: "Ensure network file system services are not in use."
     description: "The Network File System (NFS) is one of the first and most widely distributed file systems in the UNIX environment. It provides the ability for systems to mount file systems of other servers through the network."
     rationale: "If the system does not export NFS shares, it is recommended that the nfs-kernel-server package be removed to reduce the remote attack surface."
@@ -1686,7 +1687,7 @@ checks:
       - 'not c:systemctl is-active nfs-server.service -> r:^active$'
 
 # 2.1.10 Ensure nis server services are not in use. (Automated)
-  - id: 2110
+  - id: 74
     title: "Ensure nis server services are not in use."
     description: "The Network Information Service (NIS) (formally known as Yellow Pages) is a client-server directory service protocol for distributing system configuration files. The NIS server is a collection of programs that allow for the distribution of configuration files. The NIS client (ypbind) was used to bind a machine to an NIS server and receive the distributed configuration files."
     rationale: "ypserv.service is inherently an insecure system that has been vulnerable to DOS attacks, buffer overflows and has poor authentication for querying NIS maps. NIS generally has been replaced by such protocols as Lightweight Directory Access Protocol (LDAP). It is recommended that ypserv.service be removed and other, more secure services be used."
@@ -1712,7 +1713,7 @@ checks:
       - 'not c:systemctl is-active ypserv.service -> r:^active$'
 
 # 2.1.11 Ensure print server services are not in use. (Automated)
-  - id: 2111
+  - id: 75
     title: "Ensure print server services are not in use."
     description: "The Common Unix Print System (CUPS) provides the ability to print to both local and network printers. A system running CUPS can also accept print jobs from remote systems and print them to local printers. It also provides a web based remote administration capability."
     rationale: "If the system does not need to print jobs or accept print jobs from other systems, it is recommended that CUPS be removed to reduce the potential attack surface."
@@ -1740,7 +1741,7 @@ checks:
       - 'not c:systemctl is-active cups.socket cups.service -> r:^active$'
 
 # 2.1.12 Ensure rpcbind services are not in use. (Automated)
-  - id: 2112
+  - id: 76
     title: "Ensure rpcbind services are not in use."
     description: "The rpcbind utility maps RPC services to the ports on which they listen. RPC processes notify rpcbind when they start, registering the ports they are listening on and the RPC program numbers they expect to serve. The client system then contacts rpcbind on the server with a particular RPC program number. The rpcbind.service redirects the client to the proper port number so it can communicate with the requested service. Portmapper is an RPC service, which always listens on tcp and udp 111, and is used to map other RPC services (such as nfs, nlockmgr, quotad, mountd, etc.) to their corresponding port number on the server. When a remote host makes an RPC call to that server, it first consults with portmap to determine where the RPC server is listening."
     rationale: "A small request (~82 bytes via UDP) sent to the Portmapper generates a large response (7x to 28x amplification), which makes it a suitable tool for DDoS attacks. If rpcbind is not required, it is recommended to remove rpcbind package to reduce the potential attack surface."
@@ -1766,7 +1767,7 @@ checks:
       - 'not c:systemctl is-active rpcbind.socket rpcbind.service -> r:^active$'
 
 # 2.1.13 Ensure rsync services are not in use. (Automated)
-  - id: 2113
+  - id: 77
     title: "Ensure rsync services are not in use."
     description: "The rsync service can be used to synchronize files between systems over network links."
     rationale: "rsync.service presents a security risk as the rsync protocol is unencrypted. The rsync package should be removed to reduce the attack area of the system."
@@ -1792,7 +1793,7 @@ checks:
       - 'not c:systemctl is-active rsync.service -> r:^active$'
 
 # 2.1.14 Ensure samba file server services are not in use. (Automated)
-  - id: 2114
+  - id: 78
     title: "Ensure samba file server services are not in use."
     description: "The Samba daemon allows system administrators to configure their Linux systems to share file systems and directories with Windows desktops. Samba will advertise the file systems and directories via the Server Message Block (SMB) protocol. Windows desktop users will be able to mount these directories and file systems as letter drives on their systems."
     rationale: "If there is no need to mount directories and file systems to Windows systems, then this service should be deleted to reduce the potential attack surface."
@@ -1817,7 +1818,7 @@ checks:
       - 'not c:systemctl is-active smbd.service -> r:^active$'
 
 # 2.1.15 Ensure snmp services are not in use. (Automated)
-  - id: 2115
+  - id: 79
     title: "Ensure snmp services are not in use."
     description: 'Simple Network Management Protocol (SNMP) is a widely used protocol for monitoring the health and welfare of network equipment, computer equipment and devices like UPSs. Net-SNMP is a suite of applications used to implement SNMPv1 (RFC 1157), SNMPv2 (RFCs 1901-1908), and SNMPv3 (RFCs 3411-3418) using both IPv4 and IPv6. Support for SNMPv2 classic (a.k.a. "SNMPv2 historic" - RFCs 1441-1452) was dropped with the 4.0 release of the UCD-snmp package. The Simple Network Management Protocol (SNMP) server is used to listen for SNMP commands from an SNMP management system, execute the commands or collect the information and then send results back to the requesting system.'
     rationale: "The SNMP server can communicate using SNMPv1, which transmits data in the clear and does not require authentication to execute commands. SNMPv3 replaces the simple/clear text password sharing used in SNMPv2 with more securely encoded parameters. If the the SNMP service is not required, the snmpd package should be removed to reduce the attack surface of the system. Note: If SNMP is required: - The server should be configured for SNMP v3 only. User Authentication and Message Encryption should be configured. If SNMP v2 is absolutely necessary, modify the community strings' values. -."
@@ -1843,7 +1844,7 @@ checks:
       - 'not c:systemctl is-active snmpd.service -> r:^active$'
 
 # 2.1.16 Ensure tftp server services are not in use. (Automated)
-  - id: 2116
+  - id: 80
     title: "Ensure tftp server services are not in use."
     description: "Trivial File Transfer Protocol (TFTP) is a simple protocol for exchanging files between two TCP/IP machines. TFTP servers allow connections from a TFTP Client for sending and receiving files."
     rationale: "Unless there is a need to run the system as a TFTP server, it is recommended that the package be removed to reduce the potential attack surface. TFTP does not have built-in encryption, access control or authentication. This makes it very easy for an attacker to exploit TFTP to gain access to files."
@@ -1869,7 +1870,7 @@ checks:
       - 'not c:systemctl is-active tftpd-hpa.service -> r:^active$'
 
 # 2.1.17 Ensure web proxy server services are not in use. (Automated)
-  - id: 2117
+  - id: 81
     title: "Ensure web proxy server services are not in use."
     description: "Squid is a standard proxy server used in many distributions and environments."
     rationale: "Unless a system is specifically set up to act as a proxy server, it is recommended that the squid package be removed to reduce the potential attack surface. Note: Several HTTP proxy servers exist. These should be checked and removed unless required."
@@ -1895,7 +1896,7 @@ checks:
       - 'not c:systemctl is-active squid.service -> r:^active$'
 
 # 2.1.18 Ensure web server services are not in use. (Automated)
-  - id: 2118
+  - id: 82
     title: "Ensure web server services are not in use."
     description: "Web servers provide the ability to host web site content."
     rationale: "Unless there is a local site approved requirement to run a web server service on the system, web server packages should be removed to reduce the potential attack surface."
@@ -1921,7 +1922,7 @@ checks:
       - 'not c:systemctl is-active apache2.service apache2.socket -> r:^active$'
 
 # 2.1.19 Ensure xinetd services are not in use. (Automated)
-  - id: 2119
+  - id: 83
     title: "Ensure xinetd services are not in use."
     description: "The eXtended InterNET Daemon (xinetd) is an open source super daemon that replaced the original inetd daemon. The xinetd daemon listens for well known services and dispatches the appropriate daemon to properly respond to service requests."
     rationale: "If there are no xinetd services required, it is recommended that the package be removed to reduce the attack surface are of the system. Note: If an xinetd service or services are required, ensure that any xinetd service not required is stopped and masked."
@@ -1947,7 +1948,7 @@ checks:
       - 'not c:systemctl is-active xinetd.service apache2.socket -> r:^active$'
 
 # 2.1.20 Ensure X window server services are not in use. (Automated)
-  - id: 2120
+  - id: 84
     title: "Ensure X window server services are not in use."
     description: "The X Window System provides a Graphical User Interface (GUI) where users can have multiple windows in which to run programs and various add on. The X Windows system is typically used on workstations where users login, but not on servers where users typically do not login."
     rationale: "Unless your organization specifically requires graphical login access via X Windows, remove it to reduce the potential attack surface."
@@ -1971,7 +1972,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" xserver-common -> r:^install ok installed$'
 
 # 2.1.21 Ensure mail transfer agent is configured for local-only mode. (Automated)
-  - id: 2121
+  - id: 85
     title: "Ensure mail transfer agent is configured for local-only mode"
     description: "Mail Transfer Agents (MTA), such as sendmail and Postfix, are used to listen for incoming mail and transfer messages to the appropriate user or mail server. If the system is not intended to be a mail server, it is recommended that the MTA be configured to only process local mail."
     rationale: "The software for all Mail Transfer Agent is complex and most have a long history of security issues. While it is important to ensure that the system car process local mail messages, it is not necessary to have the MTA's daemon listening on a port unless the server is intended to be a mail server that receives and processes mail from other systems."
@@ -2002,7 +2003,7 @@ checks:
 #
 
 # 2.2.1 Ensure NIS Client is not installed. (Automated)
-  - id: 221
+  - id: 87
     title: "Ensure NIS Client is not installed."
     description: "The Network Information Service (NIS), formerly known as Yellow Pages, is a client-server directory service protocol used to distribute system configuration files. The NIS client was used to bind a machine to an NIS server and receive the distributed configuration files."
     rationale: "The NIS service is inherently an insecure system that has been vulnerable to DOS attacks, buffer overflows and has poor authentication for querying NIS maps. NIS generally has been replaced by such protocols as Lightweight Directory Access Protocol (LDAP). It is recommended that the service be removed."
@@ -2026,7 +2027,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" nis -> r:^install ok installed$'
 
  # 2.2.2 Ensure rsh client is not installed. (Automated)
-  - id: 222
+  - id: 88
     title: "Ensure rsh client is not installed."
     description: "The rsh-client package contains the client commands for the rsh services."
     rationale: "These legacy clients contain numerous security exposures and have been replaced with the more secure SSH package. Even if the server is removed, it is best to ensure the clients are also removed to prevent users from inadvertently attempting to use these commands and therefore exposing their credentials. Note that removing the rsh-client package removes the clients for rsh , rcp and rlogin."
@@ -2050,7 +2051,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" rsh-client -> r:^install ok installed$'
 
 # 2.2.3 Ensure talk client is not installed. (Automated)
-  - id: 223
+  - id: 89
     title: "Ensure talk client is not installed."
     description: "The talk software makes it possible for users to send and receive messages across systems through a terminal session. The talk client, which allows initialization of talk sessions, is installed by default."
     rationale: "The software presents a security risk as it uses unencrypted protocols for communication."
@@ -2074,7 +2075,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" talk -> r:^install ok installed$'
 
 # 2.2.4 Ensure telnet client is not installed. (Automated)
-  - id: 224
+  - id: 90
     title: "Ensure telnet client is not installed."
     description: "The inetutils-telnet package contains the telnet client, which allows users to start connections to other systems via the telnet protocol."
     rationale: "The telnet protocol is insecure and unencrypted. The use of an unencrypted transmission medium could allow an unauthorized user to steal credentials. The ssh package provides an encrypted session and stronger security and is included in most Linux distributions."
@@ -2098,7 +2099,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" telnet inetutils-telnet -> r:^install ok installed$'
 
 # 2.2.5 Ensure ldap client is not installed. (Automated)
-  - id: 225
+  - id: 91
     title: "Ensure ldap client is not installed."
     description: "The Lightweight Directory Access Protocol (LDAP) was introduced as a replacement for NIS/YP. It is a service that provides a method for looking up information from a central database."
     rationale: "If the system will not need to act as an LDAP client, it is recommended that the software be removed to reduce the potential attack surface."
@@ -2122,7 +2123,7 @@ checks:
       - 'not c:dpkg-query -W -f="\${Status}" ldap-utils -> r:^install ok installed$'
   
 # 2.2.6 Ensure ftp client is not installed. (Automated)
-  - id: 226
+  - id: 92
     title: "Ensure ftp client is not installed."
     description: "tnftp an enhanced FTP client, is the user interface to the Internet standard File Transfer Protocol. The program allows a user to transfer files to and from a remote network site."
     rationale: "Unless there is a need to run the system using Internet standard File Transfer Protocol (for example, to allow anonymous downloads), it is recommended that the package be removed to reduce the potential attack surface."
@@ -2150,7 +2151,7 @@ checks:
 #
 
 # 2.3.1.1 Ensure a single time synchronization daemon is in use. (Automated)
-  - id: 2311
+  - id: 93
     title: "Ensure a signle time synchronization daemon is in use (Test for chrony)"
     description: "System time should be synchronized between all systems in an environment. This is typically done by establishing an authoritative time server or a set of servers and having all systems synchronize their clocks to them. NOTE: Only ONE time synchronization method should be in use on the system. Configuring multiple time synchronization methods could lead to unexpected or unreliable results."
     rationale: "Time synchronization is important to support time sensitive security mechanisms and ensures log files have consistent time records across the enterprise, which aids in forensic investigations."
@@ -2171,7 +2172,7 @@ checks:
         - 'not c:systemctl is-active systemd-timesyncd.service -> r:^active$'
 
 # 2.3.1.1 Ensure a single time synchronization daemon is in use. (Automated)
-  - id: 23112
+  - id: 94
     title: "Ensure a signle time synchronization daemon is in use (Test for systemd-timesyncd)"
     description: "System time should be synchronized between all systems in an environment. This is typically done by establishing an authoritative time server or a set of servers and having all systems synchronize their clocks to them. NOTE: Only ONE time synchronization method should be in use on the system. Configuring multiple time synchronization methods could lead to unexpected or unreliable results."
     rationale: "Time synchronization is important to support time sensitive security mechanisms and ensures log files have consistent time records across the enterprise, which aids in forensic investigations."
@@ -2196,7 +2197,7 @@ checks:
 #
 
 # 2.3.2.1 Ensure systemd-tilesyncd configured with authorized timeserver. (Automated)
-  - id: 2321
+  - id: 95
     title: "Ensure systemd-timesyncd configured with authorized timeserver."
     description: "NTP= - A space-separated list of NTP server hostnames or IP addresses. Systemd-timesyncd will contact all configured system or per-interface servers in turn, until one responds. This setting defaults to an empty list. FallbackNTP= - A space-separated list of NTP server hostnames or IP addresses to be used as the fallback NTP servers."
     rationale: "Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
@@ -2216,7 +2217,7 @@ checks:
       - 'c:systemd-analyze cat-config systemd/timesyncd.conf | awk ''/^\s*FallbackNTP=/{line=$0} END{print line}'' -> r:^\s*FallbackNTP\s*=\s*\S+'
 
 # 2.3.2.2 Ensure systemd-timesyncd is enabled and running. (Automated)
-  - id: 2322
+  - id: 96
     title: "Ensure systemd-timesyncd is enabled and running."
     description: "systemd-timesyncd is a daemon that has been added for synchronizing the system clock across the network."
     rationale: "systemd-timesyncd needs to be enabled and running in order to synchronize the system to a timeserver. Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
@@ -2245,7 +2246,7 @@ checks:
 #
 
 # 2.3.3.1 Ensure chrony is configured with authorized timeserver. (Automated)
-  - id: 2331
+  - id: 97
     title: "Ensure chrony is configured with authorized timeserver"
     description: "server - The server directive specifies an NTP server which can be used as a time source. The client-server relationship is strictly hierarchicaled. This directive can be used multiple time to specify multiple servers. The directive is immediately followed by either the name of the server or its IP address. pool - The syntax of this directive is similar to that for the server directive, except that is used to specify a pool of NTP servers rather than a single NTP server. The pool name is expected to resolve to multiple addresses which might change over time. This directive can be used multiple time to specify multiple servers. All options valide in the server directive can be used in this directive too."
     rationale: "Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
@@ -2270,7 +2271,7 @@ checks:
       - 'f:/etc/chrony/sources.d/timeserver.sources -> r:^[^#;]\s*pool\s+\S+'
 
 # 2.3.3.2 Ensure chrony is running as user _chrony. (Automated)
-  - id: 2332
+  - id: 98
     title: "Ensure chrony is running as user _chrony."
     description: "The chrony package is installed with a dedicated user account _chrony. This account is granted the access required by the chronyd service."
     rationale: "The chronyd service should run with only the required privlidges."
@@ -2295,7 +2296,7 @@ checks:
       - 'd:/etc/chrony/conf.d/ -> r:.+\.conf$ -> r:user\s*\t*_chrony'
 
 # 2.3.3.3 Ensure chrony is enabled and running. (Automated)
-  - id: 2333
+  - id: 99
     title: "Ensure chrony is enabled and running."
     description: "chrony is a daemon for synchronizing the system clock across the network."
     rationale: "chrony needs to be enabled and running in order to synchronize the system to a timeserver. Time synchronization is important to support time sensitive security mechanisms and to ensure log files have consistent time records across the enterprise to aid in forensic investigations."
@@ -2324,7 +2325,7 @@ checks:
 #
 
 # 2.4.1.1 Ensure cron daemon is enabled and active. (Automated)
-  - id: 2411
+  - id: 100
     title: "Ensure cron daemon is enabled and active."
     description: "The cron daemon is used to execute batch jobs on the system."
     rationale: "While there may not be user jobs that need to be run on the system, the system does have maintenance jobs that may include security monitoring that have to run, and cron is used to execute them."
@@ -2341,7 +2342,7 @@ checks:
       - 'c:systemctl list-units | awk "\$1~/^crond?\.service/{print \$3}" -> r:^active$'
 
 # 2.4.1.2 Ensure permissions on /etc/crontab are configured. (Automated)
-  - id: 2412
+  - id: 101
     title: "Ensure permissions on /etc/crontab are configured."
     description: "The /etc/crontab file is used by cron to control its own jobs. The commands in this item make sure that root is the user and group owner of the file and that only the owner can access the file."
     rationale: "This file contains information on what system jobs are run by cron. Write access to these files could provide unprivileged users with the ability to elevate their privileges. Read access to these files could provide users with the ability to gain insight on system jobs that run on the system and could provide them a way to gain unauthorized privileged access."
@@ -2366,7 +2367,7 @@ checks:
       - 'c:stat -Lc "%a %u %U %g %G" /etc/crontab -> r:^600 0 root 0 root$'
 
  # 2.4.1.3 Ensure permissions on /etc/cron.hourly are configured. (Automated)
-  - id: 2413
+  - id: 102
     title: "Ensure permissions on /etc/cron.hourly are configured."
     description: "This directory contains system cron jobs that need to run on an hourly basis. The files in this directory cannot be manipulated by the crontab command, but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
     rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
@@ -2391,7 +2392,7 @@ checks:
       - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.hourly -> r:^700 0 root 0 root$'
 
  # 2.4.1.4 Ensure permissions on /etc/cron.daily are configured. (Automated)
-  - id: 2414
+  - id: 103
     title: "Ensure permissions on /etc/cron.daily are configured."
     description: "The /etc/cron.daily directory contains system cron jobs that need to run on a daily basis. The files in this directory cannot be manipulated by the crontab command, but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
     rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
@@ -2416,7 +2417,7 @@ checks:
       - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.daily -> r:^700 0 root 0 root$'
 
 # 2.4.1.5 Ensure permissions on /etc/cron.weekly are configured. (Automated)
-  - id: 2415
+  - id: 104
     title: "Ensure permissions on /etc/cron.weekly are configured."
     description: "The /etc/cron.weekly directory contains system cron jobs that need to run on a weekly basis. The files in this directory cannot be manipulated by the crontab command but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
     rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
@@ -2441,7 +2442,7 @@ checks:
       - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.weekly -> r:^700 0 root 0 root$'
 
 # 2.4.1.6 Ensure permissions on /etc/cron.monthly are configured. (Automated)
-  - id: 2416
+  - id: 105
     title: "Ensure permissions on /etc/cron.monthly are configured."
     description: "The /etc/cron.monthly directory contains system cron jobs that need to run on a monthly basis. The files in this directory cannot be manipulated by the crontab command but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
     rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
@@ -2466,7 +2467,7 @@ checks:
       - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.monthly -> r:^700 0 root 0 root$'
 
 # 2.4.1.7 Ensure permissions on /etc/cron.d are configured. (Automated)
-  - id: 2417
+  - id: 106
     title: "Ensure permissions on /etc/cron.d are configured."
     description: "The /etc/cron.d directory contains system cron jobs that need to run in a similar manner to the hourly, daily weekly and monthly jobs from /etc/crontab, but require more granular control as to when they run. The files in this directory cannot be manipulated by the crontab command but are instead edited by system administrators using a text editor. The commands below restrict read/write and search access to user and group root, preventing regular users from accessing this directory."
     rationale: "Granting write access to this directory for non-privileged users could provide them the means for gaining unauthorized elevated privileges. Granting read access to this directory could give an unprivileged user insight in how to gain elevated privileges or circumvent auditing controls."
@@ -2491,7 +2492,7 @@ checks:
       - 'c:stat -Lc "%a %u %U %g %G" /etc/cron.d -> r:^700 0 root 0 root$'
 
 # 2.4.1.8 Ensure crontab is restricted to authorized users. (Automated)
-  - id: 2418
+  - id: 107
     title: "Ensure crontab is restrited to authorized users."
     description: "Crontab is the program used to isntall, deinstall or list the tables used to drive the cron daemon. Each user can have their own crontab, and though these are files in /var/spool/cron/crontabs, they are not intended to be edited directly. If the /etc/cron.allow file exists, then you must be listed therin in order to be allowed to use this commande. If there is no /etc/cron.allow file, but the /etc/cron.deny file exist, then you must not be listed in the /etc/cron.deny file in order to use this command. If both file exist the /etc/cron.allow takes precedence. The file /etc/cron.allow and /etc/cron.deny, if they exist, must be either world-readable, or readable by group crontab. If they are not, then cron will deny access to all users until the permissions are fixed."
     rationale: "On many systems, only the system administrator is authorized to schedule cron jobs. Using the cron.allow file to control who can run cron jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to deny files."
@@ -2516,7 +2517,7 @@ checks:
 #
 
 # 2.4.2.1 Ensure at is restricted to authorized users. (Automated)
-  - id: 2421
+  - id: 108
     title: "Ensure at is restricted to authorized users."
     description: "at allow fairly complex time specifications, extending the POSIX.2 standard. It accepts times of the form HH:MM to run a job at a specific time of the day. You can also say what day the job will be run, by giving a date in the form month-name day with optional year, or giving a date of the form MMDD[CC]YY, MM/DD/[CC]YY, DD.MM.[CC]YY or [CC]YY-MM-DD. The /etc/at.allow and /etc/at.deny files determine which user can submit commands for later execution via at or batch. The format of the files is a list of usernames, one on each line. If /etc/at.allow does not exist, /etc/ad.deny is checked, every username not mentionned in it is then allowe to use at. An empty /etc/at.deny means that every user may use at. If neither file exists, only the superuser is allowed to use at."
     rationale: "On many systems, only the system administrator is authorized to schedule at jobs. Using the at.allow file to control who can run cron jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to deny files."
@@ -2542,8 +2543,8 @@ checks:
 #
 
 # 3.1.1 Ensure IPv6 status is identified. (Manual)
-# Verify that IPv6 is disabled, change the value to 0 to verify that IPv6 is enabled.
-  - id: 311
+# Verify that IPv6 is enabled, change the value to 1 to verify that IPv6 is disabled. Consider modifying the rules in accordance with the IPv6 activation or deactivation site policy.
+  - id: 109
     title: "Ensure IPv6 status is identified."
     description: "INFO: Verify that IPv6 is disabled, change the value to 0 to verify that IPv6 is enabled. IPv6 is the most recent version of IP. It's designed to supply IP addressing and additional security to support the predicted growth of connected devices. IPv6 is based on 128-bit addressing and can support 340 undecillion unique addresses."
     rationale: "IETF RFC 4038 recommends that applications are built with an assumption of dual stack. It is recommended that IPv6 be enabled and configured in accordance with Benchmark recommendations. IF - dual stack and IPv6 are not used in you environment, IPv6 may be disabled to reduce the attack surface of the system, and recommendations pertaining to IPv6 can be skipped."
@@ -2560,12 +2561,12 @@ checks:
       - mitre_techniques: ["T157", "T1557.000", "T1595", "T1595.001", "T1595.002"]
     condition: any
     rules:
-      - 'f:/sys/module/ipv6/parameters/disable -> r:^1$'
-      - 'c:sysctl net.ipv6.conf.all.disable_ipv6 -> r:^net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*1$'
-      - 'c:sysctl net.ipv6.conf.default.disable_ipv6 -> r:^net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*1$'
+      - 'f:/sys/module/ipv6/parameters/disable -> r:^0$'
+      - 'c:sysctl net.ipv6.conf.all.disable_ipv6 -> r:^net\.ipv6\.conf\.all\.disable_ipv6\s*=\s*0$'
+      - 'c:sysctl net.ipv6.conf.default.disable_ipv6 -> r:^net\.ipv6\.conf\.default\.disable_ipv6\s*=\s*0$'
   
 # 3.1.2 Ensure wireless interfaces are disabled. (Automated)
-  - id: 312
+  - id: 110
     title: "Ensure wireless interfaces are disabled."
     description: "Wireless networking is used when wired networks are unavailable."
     rationale: "IF wireless is not to be used, wireless devices can be disabled to reduce the potential attack surface."
@@ -2582,10 +2583,10 @@ checks:
       - mitre_techniques: ["T1011", "T1011.000", "T1595", "T1595.001", "T1595.002"]
     condition:
     rules:
-      - 'not c:lsmod | grep -E -w "(iwlwifi|ath|ath9k|ath10k|brcmfmac|rt2x00|rtlwifi)"'
+      - 'not c:lsmod -> r:iwlwifi|ath|ath9k|ath10k|brcmfmac|rt2x00|rtlwifi'
 
 # 3.1.3 Ensure bluetooth services are not in use. (Automated)
-  - id: 313
+  - id: 111
     title: "Ensure bluetooth services are not in use."
     description: "Bluetooth is a short-range wireless technology standard that is used for exchanging data between devices over short distances. It employs UHF radio waves in the ISM bands, from 2.402 GHz to 2.48 GHz. It is mainly used as an alternative to wire connections."
     rationale: "An attacker may be able to find a way to access or corrupt your data. One example of this type of activity is bluesnarfing, which refers to attackers using a Bluetooth connection to steal information off of your Bluetooth device. Also, viruses or other malicious code can take advantage of Bluetooth technology to infect other devices. If you are infected, your data may be corrupted, compromised, stolen, or lost."
@@ -2617,7 +2618,7 @@ checks:
 #
 
 # 3.2.1 Ensure dccp kernel module is not available. (Automated)
-  - id: 321
+  - id: 112
     title: "Ensure dccp kernel module is not available."
     description: "The Datagram Congestion Control Protocol is a transport layer protocol that supports streaming media and telephony. DCCP provides a way to gain access to congestion control, without having to do it at the application layer, but does not provide in-sequence delivery."
     rationale: "IF the protocol is not required, it is recommend that the dirvers not be installed to reduce the potential attack surface."
@@ -2638,7 +2639,7 @@ checks:
       - 'not c:lsmod -> r:^dccp\s'
 
 # 3.2.2 Ensure tipc kernel module is not available. (Automated)
-  - id: 322
+  - id: 113
     title: "Ensure tipc kernel module is not available."
     description: "The Transparent Inter-Process Communication protocol is designed to provide communication between cluster nodes."
     rationale: "IF the protocol is not required, it is recommend that the dirvers not be installed to reduce the potential attack surface."
@@ -2659,7 +2660,7 @@ checks:
       - 'not c:lsmod -> r:^tipc\s'
 
 # 3.2.3 Ensure rds kernel module is not available. (Automated)
-  - id: 323
+  - id: 114
     title: "Ensure rds kernel module is not available."
     description: "The Reliable Datagram Sockets protocol is a transport layer protocol designed to provide low-latency, high-bandwidth communication between cluster nodes. It was developed by Oracle."
     rationale: "IF the protocol is not being used, it is recommended that kernel module not be loaded, disabling the service to reduce the potential attack surface."
@@ -2680,7 +2681,7 @@ checks:
       - 'not c:lsmod -> r:^rds\s'
 
 # 3.2.4 Ensure sctp kernel module is not available. (Automated)
-  - id: 324
+  - id: 115
     title: "Ensure sctp kernel module is not available."
     description: "The Stream Control transmission Protocol is a transport layer protocol used to support messaged oriented communication, with several streams of message in one connection. It serves a similar function as TCP and UDP, incorporating features of both. It is message-oriented like UDP, and ensures reliable in-sequence transport of messages with congestion control like TCP."
     rationale: "IF the protocol is not being used, it is recommended that kernel module not be loaded, disabling the service to reduce the potential attack surface."
@@ -2705,7 +2706,7 @@ checks:
 #
 
 # 3.3.1 Ensure ip forwarding is disabled. (Automated)
-  - id: 331
+  - id: 116
     title: "Ensure ip forwarding is disabled."
     description: "The net.ipv4.ip_forward and net.ipv6.conf.all.forwarding flags are used to tell the system whether it can forward packets or not."
     rationale: Setting net.ipv4.ip_forward and net.ipv6.conf.all.forwarding to 0 ensures that a system with multiple interfaces (for example, a hard proxy), will never be able to forward packets, and therefore, never serve as a router.
@@ -2723,13 +2724,14 @@ checks:
     condition: all
     rules:
       - 'c:sysctl net.ipv4.ip_forward -> r:^net\.ipv4\.ip_forward\s*=\s*0$'
+      - 'c:sysctl net.ipv6.conf.all.forwarding -> r:^$net\.ipv6\.conf\.all\.forwarding\s*=\s*0'
       - 'f:/etc/sysctl.conf-> ignore:"file not found" && r:^[^#;]\s*net\.ipv4\.ip_forward\s*=\s*0$'
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.ip_forward\s*=\s*0$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.forwarding\s*=\s*0$'
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.forwarding\s*=\s*0$'
 
 # 3.3.2 Ensure packet redirect sending is disabled. (Automated)
-  - id: 332
+  - id: 117
     title: "Ensure packet redirect sending is disabled."
     description: "ICMP redirects are used to send routing information to other hosts. As a host itself does not act as a router, there is no nedd to send redirects."
     rationale: "An attacker could use a compromised host to send invalid ICMP redirects to other router devices in an attempt to corrupt routing and have users access a system set up by the attacker as opposed to a valid system."
@@ -2754,7 +2756,7 @@ checks:
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.send_redirects\s*=\s*0$'
 
 # 3.3.3 Ensure bogus icmp responses are ignored. (Automated)
-  - id: 333
+  - id: 118
     title: "Ensure bogus icmp responses are ignored"
     description: "Setting net.ipv4.icmp_ignore_bogus_error_responses to 1 prevents the kernel from logging bogus responses (RFC-1122 non-compliant) from broadcast reframes, keeping file systems from filling up with useless log messages."
     rationale: "Some routers (and some attackers) will send responses that violate RFC-1122 and attempt to fill up a log file system with many useless error messages."
@@ -2775,7 +2777,7 @@ checks:
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.icmp_ignore_bogus_error_responses\s*=\s*1$'
 
 # 3.3.4 Ensure broadcast icmp request are ignored. (Automated)
-  - id: 334
+  - id: 119
     title: "Ensure broadcast icmp request are ignored."
     description: "Setting net.ipv4.icmp_echo_ignore_broadcasts to 1 will cause the system to ignore all ICMP echo and timestamp requests to broadcast and multicast addresses."
     rationale: "Accepting ICMP echo and timestamp requests with broadcast or multicast destinations for your network could be used to trick your host into starting (or participating) in a Smurf attack. A Smurf attack relies on an attacker sending large amounts of ICMP broadcast messages with a spoofed source address. All hosts receiving this message and responding would send echo-reply messages back to the spoofed address, which is probably not routable. If many hosts respond to the packets, the amount of traffic on the network could be significantly multiplied."
@@ -2796,7 +2798,7 @@ checks:
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.icmp_echo_ignore_broadcasts\s*=\s*1$'
 
 # 3.3.5 Ensure icmp redirects are not accepted. (Automated)
-  - id: 335
+  - id: 120
     title: "Ensure icmp redirects are not accepted."
     description: "ICMP redirect messages are packets that convey routing information and tell your host (acting as a router) to send packets via an alternate path. It is a way of allowing an outside routing device to update your system routing tables."
     rationale: "ICMP redirect messages are packets that convey routing information and tell your host (acting as a router) to send packets via an alternate path. It is a way of allowing an outside routing device to update your system routing tables. By setting net.ipv4.conf.all.accept_redirects, net.ipv4.conf.default.accept_redirects, net.ipv6.conf.all.accept_redirects, and net.ipv6.conf.default.accept_redirects to 0, the system will not accept any ICMP redirect messages, and therefore, won't allow outsiders to update the system's routing tables."
@@ -2814,6 +2816,8 @@ checks:
     rules:
       - 'c:sysctl net.ipv4.conf.all.accept_redirects -> r:^net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0$'
       - 'c:sysctl net.ipv4.conf.default.accept_redirects -> r:^net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0$'
+      - 'c:sysctl net.ipv6.conf.all.accept_redirects -> r:^net\.ipv6\.conf\.all\.accept_redirects\s*=\s*0$'
+      - 'c:sysctl net.ipv6.conf.default.accept_redirects -> r:^net\.ipv6\.conf\.default\.accept_redirects\s*=\s*0$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0$'
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.accept_redirects\s*=\s*0$'
       - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.accept_redirects\s*=\s*0$'
@@ -2824,7 +2828,7 @@ checks:
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv6\.conf\.default\.accept_redirects\s*=\s*0$'
 
 # 3.3.6 Ensure secure icmp redirects are not accepted. (Automated)
-  - id: 336
+  - id: 121
     title: "Ensure secure icmp redirects are not accepted."
     description: "Secure ICMP redirects are the same as ICMP redirects, except they come from gateways listed on the default gateway list. It is assumed that these gateways are known to your system, and that they are likely to be secure."
     rationale: "It is still possible for even known gateways to be compromised. Setting net.ipv4.conf.all.secure_redirects and net.ipv4.conf.default.secure_redirects to 0 protects the system from routing table updates by possibly compromised known gateways"
@@ -2848,14 +2852,15 @@ checks:
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.secure_redirects\s*=\s*1$'
 
 # 3.3.7 Ensure reverse path filtering is enabled. (Automated)
-  - id: 337
+  - id: 122
     title: "Enure reverse path filtering is enabled."
     description: "Setting net.ipv4.conf.all.rp_filter and net.ipv4.conf.default.rp_filter to 1 forces the Linux kernel to utilize reverse path filtering on a received packet to determine if the packet was valid. Essentially, with reverse path filtering, if the return packet does not go out the same interface that the corresponding source packet came from, the packet is dropped (and logged if log_martians is set)."
-    rationale:
+    rationale: "Setting net.ipv4.conf.all.rp_filter and net.ipv4.conf.default.rp_filter to 1 is a good way to deter attackers from sending your system bogus packets that cannot be responded to. One instance where this feature breaks down is if asymmetrical routing is employed. This would occur when using dynamic routing protocols (bgp, ospf, etc) on your system. If you are using asymmetrical routing on your system, you will not be able to enable this feature without breaking the routing."
+    impact: "If you are using asymmetrical routing on your system, you will not be able to enable this feature without breaking the routing."
     remediation: "Set the following parameters in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv4.conf.all.rp_filter = 1 # net.ipv4.conf.default.rp_filter = 1"
     level: "Level 1"
     compliance:
-      - cis: ["3.3.6"]
+      - cis: ["3.3.7"]
       - cis_csc_v8: ["4.8"]
       - cis_csc_v7: ["9.2"]
       - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
@@ -2863,4 +2868,124 @@ checks:
       - mitre_tactics: ["TA0006", "TA0009"]
       - mitre_techniques: ["T1557", "T1557.000"]
     condition: all
+    rules:
+      - 'c:sysctl net.ipv4.conf.all.rp_filter -> r:^net\.ipv4\.conf\.all\.rp_filter\s*=\s*1$'
+      - 'c:sysctl net.ipv4.conf.default.rp_filter -> r:^net\.ipv4\.conf\.default\.rp_filter\s*=\s*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.rp_filter\s*=\s*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.rp_filter\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.rp_filter\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.rp_filter\s*=\s*1$'
+
+# 3.3.8 Ensure source routed packets are not accepted. (Automated)
+  - id: 123
+    title: "Enure source routed packets are not accepted."
+    description: "In networking, source routing allows a sender to partially or fully specify the route packets take through a network. In contrast, non-source routed packets travel a path determined by routers in the network. In some cases, systems may not be routable or reachable from some locations (e.g. private addresses vs. Internet routable), and so source routed packets would need to be used."
+    rationale: "Setting net.ipv4.conf.all.accept_source_route, net.ipv4.conf.default.accept_source_route, net.ipv6.conf.all.accept_source_route and net.ipv6.conf.default.accept_source_route to 0 disables the system from accepting source routed packets. Assume this system was capable of routing packets to Internet routable addresses on one interface and private addresses on another interface. Assume that the private addresses were not routable to the Internet routable addresses and vice versa. Under normal routing circumstances, an attacker from the Internet routable addresses could not use the system as a way to reach the private address systems. If, however, source routed packets were allowed, they could be used to gain access to the private address systems as the route could be specified, rather than rely on routing protocols that did not allow this routing."
+    remediation: "Set the following parameters in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv4.conf.all.accept_source_route = 0, # net.ipv4.conf.default.accept_source_route = 0"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.8"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: [""]
+      - mitre_tactics: ["TA0007"]
+      - mitre_techniques: ["T1590", "T1590.005"]
+    condition: all
+    rules:
+      - 'c:sysctl net.ipv4.conf.all.accept_source_route -> r:^net\.ipv4\.conf\.all\.accept_source_route\s*=\s*0$'
+      - 'c:sysctl net.ipv4.conf.default.accept_source_route -> r:^net\.ipv4\.conf\.default\.accept_source_route\s*=\s*0$'
+      - 'c:net.ipv6.conf.all.accept_source_route -> r:^net\.ipv6\.conf\.all\.accept_source_route\s*=\s*0$'
+      - 'c:net.ipv6.conf.default.accept_source_route -> r:^net\.ipv6\.conf\.default\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysc.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysc.conf -> r:^[^#;]\s*net\.ipv6\.conf\.default\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv6\.conf\.all\.accept_source_route\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv6\.conf\.default\.accept_source_route\s*=\s*0$'
+
+# 3.3.9 Ensure suspicious packets are logged. (Automated)
+  - id: 124
+    title: "Ensure suspicious packets are logged."
+    description: "When enabled, this feature logs packets with un-routable source addresses to the kernel log."
+    rationale: "Setting net.ipv5.conf.all.log_martians and net.ipv4.conf.default.log_martians to 1 enables this feature. Logging these packets allow an administrator to investigate the possibility that an attacker is sending spoofed packets to their system."
+    remediation: "Set the following parameters in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv4.conf.all.log_martians = 1, # net.ipv4.conf.default.log_martians = 1"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.9"]
+      - cis_csc_v8: ["8.5"]
+      - cis_csc_v7: ["6.2", "6.3"]
+      - nist_sp_800-53: ["AU-3"]
+      - mitre_mitigations: [""]
+      - mitre_tactics: ["TA005"]
+      - mitre_techniques: ["T1562", "T1562.006"]
+    condition: all
+    rules:
+      - 'c:sysctl net.ipv4.conf.all.log_martians -> r:^net\.ipv4\.conf\.all\.log_martians\s*=\s=*1$'
+      - 'c:sysctl net.ipv4.conf.default.log_martians -> r:^net\.ipv4\.conf\.default\.log_martians\s*=\s*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.log_martians\s*=\s=*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.log_martians\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.all\.log_martians\s*=\s=*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.conf\.default\.log_martians\s*=\s*1$'
+
+# 3.3.10 Ensure tcp syn cookies is enabled. (Automated)
+  - id: 125
+    title: "Ensure tcp syn cookies is enabled."
+    description: "When tcp_syncookies is set, the kernel will handle TCP SYN packets normally until the half-open connection queue is full, at which time, the SYN cookie functionality kicks in. SYN cookies work by not using the SYN queue at all. Instead, the kernel simply replies to the SYN with a SYN/ACK, but will include a specially crafted TCP sequence number that encodes the source and destination IP address and port number and the time the packet was sent. A legitimate connection would send the ACK packet of the three way handshake with the specially crafted sequence number. This allows the system to verify that it has received a valid response to a SYN cookie and allow the connection, even though there is no corresponding SYN in the queue."
+    rationale: "Attackers use SYN flood attacks to perform a denial of service attacked on a system by sending many SYN packets without completing the three way handshake. This will quickly use up slots in the kernel's half-open connection queue and prevent legitimate connections from succeeding. Setting net.ipv4.tcp_syncookies to 1 enables SYN cookies, allowing the system to keep accepting valid connections, even if under a denial of service attack."
+    remediation: "Set the following parameter in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv4.tcp_syncookies = 1"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.10"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1037"]
+      - mitre_tactics: ["TA0040"]
+      - mitre_techniques: ["T1499", "T1499.001"]
+    condition: all
+    rules:
+      - 'c:sysctl net.ipv4.tcp_syncookies -> r:^net\.ipv4\.tcp_syncookies\s*=\s*1$'
+      - 'f:/etc/sysc.conf -> r:^[^#;]\s*net\.ipv4\.tcp_syncookies\s*=\s*1$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.tcp_syncookies\s*=\s*1$'
+
+# 3.3.11 Ensure IPv6 router advertisements are not accepted. (Automated)
+  - id: 126
+    title: "Ensure IPv6 router advertisements are not accepted."
+    description: "Routers periodically multicast Router Advertisement messages to announce their availability and convey information to neighboring nodes that enable them to be automatically configured on the network. net.ipv6.conf.all.accept_ra and net.ipv6.conf.default.accept_ra determine the systems ability to accept these advertisements"
+    rationale: "It is recommended that systems do not accept router advertisements as they could be tricked into routing traffic to compromised machines. Setting hard routes within the system (usually a single default route to a trusted router) protects the system from bad routes. Setting net.ipv6.conf.all.accept_ra and net.ipv6.conf.default.accept_ra to 0 disables the system's ability to accept IPv6 router advertisements."
+    remediation: "IF IPv6 is enabled on the system: Set the following parameters in /etc/sysctl.conf or a file in /etc/sysctl.d/ ending in .conf (like network.conf): # net.ipv6.conf.all.accept_ra = 0 # net.ipv6.conf.default.accept_ra = 0"
+    level: "Level 1"
+    compliance:
+      - cis: ["3.3.11"]
+      - cis_csc_v8: ["4.8"]
+      - cis_csc_v7: ["9.2"]
+      - nist_sp_800-53: ["CM-1", "CM-2", "CM-6", "CM-7", "IA-5"]
+      - mitre_mitigations: ["M1030", "M1042"]
+      - mitre_tactics: ["TA0006", "TA0040"]
+      - mitre_techniques: ["T1557", "T1557.000"]      
+    condition: all
+    rules:
+      - 'c:sysctl net.ipv6.conf.all.accept_ra -> r:^net\.ipv6\.conf\.all\.accept_ra\s*=\s*0$'
+      - 'c:sysctl net.ipv6.conf.default.accept_ra -> r:^net\.ipv6\.conf\.default\.accept_ra\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^net\.ipv6\.conf\.all\.accept_ra\s*=\s*0$'
+      - 'f:/etc/sysctl.conf -> r:^net\.ipv6\.conf\.default\.accept_ra\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^net\.ipv6\.conf\.all\.accept_ra\s*=\s*0$'
+      - 'f:/etc/sysctl.d/network.conf -> r:^net\.ipv6\.conf\.default\.accept_ra\s*=\s*0$'
+      
+# 4 - Host Based Firewall
+# 4.1 - Configure a signle firewall utility
+#
+#
+
+# 4.1.1 Ensure a single firewall configuration utility is in use. (Automated)
+  - id: 127
+    title:
+    description:
+    rationale:
+    remediation:
+    level: "Level 1"
+    compliance:
     rules:
