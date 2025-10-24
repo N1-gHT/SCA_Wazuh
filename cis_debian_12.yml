@@ -2581,7 +2581,7 @@ checks:
       - mitre_mitigations: ["M1028"]
       - mitre_tactics: ["TA0010"]
       - mitre_techniques: ["T1011", "T1011.000", "T1595", "T1595.001", "T1595.002"]
-    condition:
+    condition: all
     rules:
       - 'not c:lsmod -> r:iwlwifi|ath|ath9k|ath10k|brcmfmac|rt2x00|rtlwifi'
 
@@ -2981,11 +2981,135 @@ checks:
 #
 
 # 4.1.1 Ensure a single firewall configuration utility is in use. (Automated)
+# Following security recommendations and given the obsolescence of IPTables, the test focuses on verifying that NFTables is indeed the only firewall used. This can be modified for UFW or IPTables.
   - id: 127
-    title:
-    description:
-    rationale:
-    remediation:
+    title: "Ensure a signle firewall configuration utility is in use."
+    description: "In Linux security, employing a single, effective firewall configuration utility ensures that only legitimate traffic gets processed, reducing the system’s exposure to potential threats. The choice between ufw, nftables, and iptables depends on organizational needs."
+    rationale: "Proper configuration of a single firewall utility minimizes cyber threats and protects services and data, while avoiding vulnerabilities like open ports or exposed services. Standardizing on a single tool simplifies management, reduces errors, and fortifies security across Linux systems."
+    impact: "The use of more than one firewall utility may produce unexpected results."
+    remediation: "Remediating to a single firewall configuration is a complex process and involves several steps. The following provides the basic steps to follow for a single firewall configuration: 1. Determine which firewall utility best fits organizational needs 2. Follow the recommendations in the subsequent subsection for the single firewall to be used. 3. Return to this recommendation to ensure a single firewall configuration utility is in use"
+    level: "Level 1"
+    references:
+      - "https://wiki.debian.org/DebianFirewall"
+      - "https://wiki.ubuntu.com/UncomplicatedFirewall"
+      - "https://assets.ubuntu.com/v1/544d9904-ubuntu-server-guide-2024-01-22.pdf"
+      - "https://www.debian.org/doc/manuals/debian-reference/debian-reference.en.pdf"
+    compliance:
+      - cis: ["4.1.1"]
+      - cis_csc_v8: ["4.4", "4.5"]
+      - cis_csc_v7: ["9.4"]
+      - mitre_mitigations: ["M1031", "M1037"]
+      - mitre_tactics: ["TA0011"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
+    rules:
+      - 'c:sh -c "
+          {
+            systemctl is-active ufw;
+            systemctl is-enabled ufw;
+            systemctl is-active nftables;
+            systemctl is-enabled nftables;
+            systemctl is-active iptables;
+            systemctl is-enabled iptables;
+          } 2>/dev/null | grep -E ''^(active|enabled)$'' | wc -l
+        " -> r:^2$'
+
+# 4.2 - Configure UncomplicatedFirewall
+#
+#
+
+# 4.2.1 Ensure ufw is installed. (Automated)
+  - id: 128
+    title:  "Ensure ufw is installed."
+    description: "The Uncomplicated Firewall (ufw) is a frontend for iptables and is particularly well-suited for host-based firewalls. ufw provides a framework for managing netfilter, as well as a command-line interface for manipulating the firewall."
+    rationale: "A firewall utility is required to configure the Linux kernel's netfilter framework via the iptables or nftables back-end. The Linux kernel's netfilter framework host-based firewall can protect against threats originating from within a corporate network to include malicious mobile code and poorly configured software on a host. Note: Only one firewall utility should be installed and configured. UFW is dependent on the iptables package"
+    remediation: "Run the following command to install UFC: # apt install ufw"
     level: "Level 1"
     compliance:
+      - cis: ["4.2.1"]
+      - cis_csc_v8: ["4.4", "4.5"]
+      - cis_csc_v7: ["9.4"]
+      - nist_sp_800-53: ["SC-7"]
+      - mitre_mitigations: ["M1031", "M1037"]
+      - mitre_tactics: ["TA0011"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
+    rules:
+      - 'c:dpkg-query -W -f="\${Status}" ufw -> r:^install ok installed$'
+
+# 4.2.2 Ensure iptables-persistent is not installed with UFW. (Automated)
+  - id: 129
+    title: "Ensure iptables-persistent is not installed with UFW."
+    description: "The iptables-persistent is a boot-time loader for netfilter rules, iptables plugin."
+    rationale: "Running bot ufw and the services included in the iptables-persistent package may lead to conflict."
+    remediation: "Run the following command to remove the iptables-persistent package: # apt purge iptables-persistent"
+    level: "Level 1"
+    compliance:
+      - cis: ["4.2.2"]
+      - cis_csc_v8: ["4.4", "4.5"]
+      - cis_csc_v7: ["9.4"]
+      - nist_sp_800-53: ["SC-7"]
+      - mitre_mitigations: ["M1033"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
+    rules:
+      - 'not c:dpkg-query -W -f="\${Status}" iptables-persistent -> r:^install ok installed$'
+
+# 4.2.3 Ensure UFW is enabled. (Automated)
+  - id: 130
+    title: "Ensure UFW service is enabled."
+    description: "UncomplicatedFirewall (ufw) is a frontend for iptables. ufw provides a framework for managing netfilter, as well as a command-line and available graphical user interface for manipulating the firewall."
+    rationale: "The UFW service must be enabled and running in order for UFW to protect the system."
+    impact: "Changing firewall settings while connected over network can result in being locked out of the system."
+    remediation: "Rune the following command to unmask the UFW daemon: # systemctl unmask ufw.service. Run the following command to enable and start the ufw daemon:# systemctl --now enable ufw.service. Run the following command to enable ufw: # ufw enable."
+    level: "Level 1"
+    references:
+      - "http://manpages.ubuntu.com/manpages/precise/en/man8/ufw.8.html"
+    compliance:
+      - cis: ["4.2.3"]
+      - cis_csc_v8: ["4.4", "4.5"]
+      - cis_csc_v7: ["9.4"]
+      - nist_sp_800-53: ["SC-7"]
+      - mitre_mitigations: ["M1018"]
+      - mitre_tactics: ["TA0005"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
+    rules:
+      - 'c:systemctl is-enabled ufw.service -> r:^enabled$'
+      - 'c:systemctl is-active ufw -> r:^active$'
+
+# 4.2.4 Ensure UFW loopback traffic is configured. (Automated)
+  - id: 131
+    title: "Ensure UFW loopback is configured."
+    description: "Configure the loopback interface to accept traffic. Configure all other interfaces to deny traffic to the loopback network (127.0.0.0/8 for IPv4 and ::1/128 for IPv6)."
+    rationale: "Loopback traffic is generated between processes on machine and is typically critical to operation of the system. The loopback interface is the only place that loopback network (127.0.0.0/8 for IPv4 and ::1/128 for IPv6) traffic should be seen, all other interfaces should ignore traffic on this network as an anti-spoofing measure."
+    remediation: "Run the following commands to configure the loopback interface to accept traffic: # ufw allow in on lo, # ufw allow out on lo. Run the following commands to configure all other interfaces to deny traffic to the loopback network: # ufw deny in from 127.0.0.0/8, # ufw deny in from ::1"
+    level: "Level 1" 
+    references:
+      - "https://manpages.ubuntu.com/manpages/jammy/en/man8/ufw-framework.8.html"
+    compliance:
+      - cis: ["4.2.4"]
+      - cis_csc_v8: ["4.4", "4.5"]
+      - cis_csc_v7: ["9.4"]
+      - nist_sp_800-53: ["SC-7"]
+      - mitre_mitigations: ["M1031", "M1037"]
+      - mitre_tactics: ["TA0011"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
+    rules:
+      - 'f:/etc/ufw/before.rules -> r:^[^#;]\s*-A\s*ufw-before-input\s*-i\s*lo\s*-j\s*ACCEPT$'
+      - 'f:/etc/ufw/before.rules -> r:^[^#;]\s*-A\s+ufw-before-output\s+-o\s+lo\s+-j\s+ACCEPT'
+      - 'c:ufw status verbose -> r:^\s*127\.0\.0\.0/8\s+DENY IN\s+Anywhere$'
+      - 'c:ufw status verbose -> r:^\s*::1\s+DENY IN\s+Anywhere\s+\(v6\)$'
+
+# 4.2.5 Ensure UFW outbound connections are configured. (Manual)
+  - id: 132
+    title: "Ensure UFW outbound connections are configured."
+    description: "Configure the firewall rules for new outbound connections."
+    rationale: "If rules are not in place for new outbound connections all packets will be dropped by the default policy preventing network usage."
+    remediation: "Configure ufw in accordance with site policy. The following commands will implement a policy to allow all outbound connections on all interfaces: # ufw allow out on all"
+    level: "Level 1"
+    compliance: 
+    condition:
     rules:
