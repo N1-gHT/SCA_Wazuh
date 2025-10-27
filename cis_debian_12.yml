@@ -2948,7 +2948,7 @@ checks:
     condition: all
     rules:
       - 'c:sysctl net.ipv4.tcp_syncookies -> r:^net\.ipv4\.tcp_syncookies\s*=\s*1$'
-      - 'f:/etc/sysc.conf -> r:^[^#;]\s*net\.ipv4\.tcp_syncookies\s*=\s*1$'
+      - 'f:/etc/sysctl.conf -> r:^[^#;]\s*net\.ipv4\.tcp_syncookies\s*=\s*1$'
       - 'f:/etc/sysctl.d/network.conf -> r:^[^#;]\s*net\.ipv4\.tcp_syncookies\s*=\s*1$'
 
 # 3.3.11 Ensure IPv6 router advertisements are not accepted. (Automated)
@@ -3110,6 +3110,62 @@ checks:
     rationale: "If rules are not in place for new outbound connections all packets will be dropped by the default policy preventing network usage."
     remediation: "Configure ufw in accordance with site policy. The following commands will implement a policy to allow all outbound connections on all interfaces: # ufw allow out on all"
     level: "Level 1"
-    compliance: 
-    condition:
+    compliance:
+      - cis: ["4.2.5"]
+      - cis_csc_v8: ["4.5"]
+      - cis_csc_v7: ["9.4"]
+      - nist_sp_800-53: ["SC-7"]
+      - mitre_mitigations: ["M1031", "M1037"]
+      - mitre_tactics: ["TA0011"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
     rules:
+      - 'c:ufw status numbered -> r:\s*ALLOW OUT\s+Anywhere on all$'
+      - 'c:ufw status numbered -> r:\s*ALLOW OUT\s+Anywhere\s+\(v6\) on all$'
+
+# 4.2.6 Ensure UFW firewall rules exist for all open ports. (Automated)
+  - id: 133
+    title: "Ensure UFW firewall rules existe for all open ports."
+    description: "Services and ports can be accepted or explicitly rejected. This rule attempts to see if there is a difference between ports that are listening and those managed by the firewall."
+    rationale: "To reduce the attack surface of a system, all services and ports should be blocked unless required. Any ports that have been opened on non-loopback addresses need firewall rules to govern traffic. Without a firewall rule configured for open ports, the default firewall policy will drop all packets to these ports. Required ports should have a firewall rule created to allow approved connections in accordance with local site policy. Unapproved ports should have an explicit deny rule created."
+    remediation: "For each port identified in the audit which does not have a firewall rule, evaluate the service listening on the port and add a rule for accepting or denying inbound connections in accordance with local site policy: # ufw allow in <port>/<tcp or udp protocol>. # ufw deny in <port>/<tcp or udp protocol>"
+    level: "Level 1"
+    compliance:
+      - cis: ["4.2.6"]
+      - cis_csc_v8: ["4.4"]
+      - cis_csc_v7: ["9.4"]
+      - nist_sp_800-53: ["SC-7"]
+      - mitre_mitigations: ["M1031", "M1037"]
+      - mitre_tactics: ["TA0011"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+    condition: all
+    rules:
+      - 'not c:sh -c ''OPEN_PORTS=$(ss -Hltun | awk ''($5!~/^127\.|^\[::1\]/) {sub(/.*:/, "", $5); print $5}'' | sort -u);
+          UFW_PORTS=$(ufw status verbose | grep -o ''^\h*\d+\b'' | sort -u);
+          (echo "$OPEN_PORTS"; echo "$UFW_PORTS"; echo "$UFW_PORTS") | sort | uniq -u'''
+
+# 4.2.7 Ensure ufw default deny firewall policy. (Automated)
+  - id: 134
+    title: "Ensure ufw default deny firewall policy."
+    description: "A default deny policy on connections ensures that any unconfigured network usage will be rejected. Note: Any port or protocol without a explicit allow before the default deny will be blocked."
+    rationale: "With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to allow list acceptable usage than to deny list unacceptable usage."
+    impact: "Any port and protocol not explicitly allowed will be blocked. The following rules should be considered before applying the default deny. ufw allow out http ufw allow out https ufw allow out ntp # Network Time Protocol ufw allow out to any port 53 # DNS ufw allow out to any port 853 # DNS over TLS ufw logging on."
+    remediation: "Run the following commands to implement a default deny policy: # ufw default deny incoming # ufw default deny outgoing # ufw default deny routed."
+    compliance:
+      - cis: ["4.2.7"]
+      - cis_csc_v8: ["4.4", "4.5"]
+      - cis_csc_v7: ["9.4"]
+      - cmmc_v2.0: ["AC.L1-3.1.20", "CM.L2-3.4.7", "SC.L1-3.13.1", "SC.L2-3.13.6"]
+      - iso_27001-2013: ["A.13.1.1"]
+      - mitre_mitigations: ["M1031", "M1037"]
+      - mitre_tactics: ["TA0011"]
+      - mitre_techniques: ["T1562", "T1562.004"]
+      - nist_sp_800-53: ["SC-7(5)"]
+      - pci_dss_v3.2.1: ["1.1.4", "1.3.1", "1.4"]
+      - pci_dss_v4.0: ["1.2.1", "1.4.1"]
+      - soc_2: ["CC6.6"]
+    condition: all
+    rules:
+      - 'c:ufw status verbose -> r:^Default && r:deny\s+\(incoming\)|reject\s+\(incoming\)|disabled\s+\(incoming\)'
+      - 'c:ufw status verbose -> r:^Default && r:deny\s+\(outgoing\)|reject\s+\(outgoing\)|disabled\s+\(outgoing\)'
+      - 'c:ufw status verbose -> r:^Default && r:deny\s+\(routed\)|reject\s+\(routed\)|disabled\s+\(routed\)'
